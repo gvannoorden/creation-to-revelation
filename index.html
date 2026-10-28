@@ -1,0 +1,1401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Creation to Revelation: An Interactive Bible Timeline</title>
+<meta name="description" content="An interactive timeline of the whole Bible: patriarchs, the kings of Israel and Judah, the prophets, Jesus and the apostles, the books of the Bible, and the empires around them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#EDEFEA; --surface:#FBFBF8; --ink:#1A1D21; --muted:#5A6067; --rule:#C4C8C0; --grid:#E2E5DE;
+  --united:#5E7330; --judah:#A87412; --israel:#2D5E8A; --prophet:#8A2E44; --oprophet:#B2647E;
+  --book:#56616C; --leader:#2C7C76; --era:#2E3338;
+  --right:#2E7D4F; --evil:#B23A31; --mixed:#C08417; --none:#8B9198;
+  --assyria:#7C4A2A; --babylon:#5A3F92; --persia:#21797B; --egypt:#9E7D22; --aram:#69703A; --greece:#3F63B5; --rome:#7D1D2E;
+  --patriarch:#6B4F2A; --judea:#4F6D7A; --christ:#C2571A; --ntbook:#4C6B57;
+  --accent:#2D5E8A;
+  --font-ui:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --font-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --lw:150px; --rh:26px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#1B1E22; --surface:#23272C; --ink:#E9EAE6; --muted:#A3A9AF; --rule:#3C4248; --grid:#2D3237;
+    --united:#9DB36A; --judah:#E0AE4A; --israel:#73A6D6; --prophet:#E27C93; --oprophet:#D49AB0;
+    --book:#A3AEB9; --leader:#5FC2B9; --era:#C9CDD1;
+    --right:#5DBB83; --evil:#EC7A6E; --mixed:#E6B04E; --none:#8E959C;
+    --assyria:#C98B62; --babylon:#A68BE0; --persia:#58C3C4; --egypt:#D6B456; --aram:#A9B26A; --greece:#8FA8EE; --rome:#E07A8A;
+    --patriarch:#C9A27A; --judea:#8FB3C4; --christ:#F29A5C; --ntbook:#8FC1A0;
+    --accent:#73A6D6;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#1B1E22; --surface:#23272C; --ink:#E9EAE6; --muted:#A3A9AF; --rule:#3C4248; --grid:#2D3237;
+  --united:#9DB36A; --judah:#E0AE4A; --israel:#73A6D6; --prophet:#E27C93; --oprophet:#D49AB0;
+  --book:#A3AEB9; --leader:#5FC2B9; --era:#C9CDD1;
+  --right:#5DBB83; --evil:#EC7A6E; --mixed:#E6B04E; --none:#8E959C;
+  --assyria:#C98B62; --babylon:#A68BE0; --persia:#58C3C4; --egypt:#D6B456; --aram:#A9B26A;
+  --accent:#73A6D6;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);display:flex;flex-direction:column;min-height:0}
+button{font-family:inherit}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;padding:16px 20px 12px;background:var(--surface);border-bottom:3px solid var(--ink)}
+h1{font-family:var(--font-ui);font-weight:700;font-size:clamp(28px,3.4vw,40px);line-height:.92;margin:0;letter-spacing:-.005em}
+.sub{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.4;max-width:60ch}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand svg{width:60px;height:60px;flex:0 0 auto}
+.viewrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.viewrow #layoutSeg button{font-size:15px;padding:8px 12px}
+.pop{position:fixed;z-index:40;background:var(--surface);color:var(--ink);border:2px solid var(--ink);border-radius:6px;box-shadow:0 14px 36px rgba(0,0,0,.24);padding:14px 16px 16px;width:min(380px,calc(100vw - 24px));max-height:min(74vh,680px);overflow:auto}
+.pop[hidden]{display:none}
+.pop-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.pop-head h2{font:700 22px var(--font-ui);margin:0}
+.pop .p-help{font:500 14px var(--font-ui);color:var(--muted);margin:0 0 10px}
+.lanes{list-style:none;margin:0 0 12px;padding:0}
+.lanes li{display:flex;align-items:center;gap:8px;padding:5px 6px 5px 4px;border:1.5px solid var(--rule);border-radius:5px;margin-bottom:6px;background:var(--surface);font:600 16px var(--font-ui);user-select:none}
+.lanes li.dragging{border-color:var(--ink);box-shadow:0 6px 16px rgba(0,0,0,.2);position:relative;z-index:1}
+.lanes li.off .lname{color:var(--muted);text-decoration:line-through}
+.lanes .handle{cursor:grab;touch-action:none;border:0;background:none;color:var(--muted);padding:4px 2px;display:flex}
+.lanes .handle:active{cursor:grabbing}
+.lanes input{accent-color:var(--ink);width:17px;height:17px;margin:0}
+.lanes .lname{flex:1;display:flex;flex-direction:column;line-height:1.1}
+.lanes .lname small{font-weight:500;font-size:12.5px;color:var(--muted)}
+.lanes .lsw{width:12px;height:12px;border-radius:2px;border:1.5px solid var(--c);background:color-mix(in srgb,var(--c) 30%,var(--surface));flex:0 0 auto}
+.lanes .mv{border:1.5px solid var(--rule);background:none;color:var(--ink);border-radius:4px;width:28px;height:28px;cursor:pointer;font-size:14px;line-height:1}
+.lanes .mv:disabled{opacity:.3;cursor:default}
+.pop-actions{display:flex;gap:8px;flex-wrap:wrap}
+.legend-full h3{font:700 16px var(--font-ui);margin:12px 0 6px;padding-bottom:2px;border-bottom:1.5px solid var(--ink)}
+.legend-full .grid{display:flex;flex-wrap:wrap;gap:6px 14px;font:500 14px var(--font-ui);color:var(--ink)}
+.legend .chip{min-height:24px;padding:1px 10px;font-size:13px}
+.focusbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 20px 8px;padding:7px 12px;border:1.5px solid var(--accent);border-radius:6px;background:color-mix(in srgb,var(--accent) 10%,var(--surface));font:500 15px var(--font-ui)}
+.focusbar[hidden]{display:none}
+.chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:4px;overflow:hidden;flex:0 0 auto}
+.seg button{font:600 15px var(--font-ui);padding:6px 12px;background:transparent;color:var(--ink);border:0;border-left:2px solid var(--ink);cursor:pointer;min-height:34px}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.views{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.views .seg button{font-size:17px;padding:8px 13px}
+.views small{font:500 13px var(--font-ui);color:var(--muted)}
+
+/* Toolbar */
+.tools{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--rule)}
+.field{display:inline-flex;align-items:center;gap:6px;font:500 14px var(--font-ui);color:var(--muted)}
+select,input[type="search"]{font:500 15px var(--font-ui);color:var(--ink);background:var(--bg);border:1.5px solid var(--rule);border-radius:4px;padding:5px 8px;min-height:34px}
+input[type="search"]{width:150px}
+#colorBy{max-width:130px}
+.viewrow .btn{min-height:40px}
+.theme{display:inline-flex;align-items:center;justify-content:center}
+.theme .i-sun{display:none}
+html.is-dark .theme .i-sun{display:block}
+html.is-dark .theme .i-moon{display:none}
+.viewrow .btn.sq{width:40px}
+#bookSel{max-width:130px}
+.tools .field{white-space:nowrap}
+.btn{font:600 15px var(--font-ui);border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:4px;padding:5px 12px;min-height:34px;cursor:pointer}
+.btn[aria-expanded="true"]{background:var(--ink);color:var(--surface)}
+.btn.sq{width:34px;padding:0;font-size:19px;line-height:1}
+.spacer{flex:1 1 auto}
+.zoom{display:inline-flex;gap:4px}
+
+/* Filters drawer */
+.drawer{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px 28px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--rule)}
+.drawer[hidden]{display:none}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+fieldset legend{font:700 16px var(--font-ui);margin-bottom:6px;padding:0}
+.opt{display:inline-flex;align-items:center;gap:6px;font:500 15px var(--font-ui);margin:0 14px 6px 0;cursor:pointer}
+.opt input{accent-color:var(--ink);width:16px;height:16px;margin:0}
+.opt.na{opacity:.45}
+.drawer .note{font:500 13px var(--font-ui);color:var(--muted);margin:2px 0 0}
+
+/* Jump + legend */
+.strip{display:flex;gap:6px;align-items:center;overflow-x:auto;padding:8px 20px;scrollbar-width:thin}
+.strip > span{font:500 14px var(--font-ui);color:var(--muted);white-space:nowrap;margin-right:2px}
+.chip{font:600 14px var(--font-ui);white-space:nowrap;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:999px;padding:3px 11px;cursor:pointer;min-height:28px}
+.chip:hover{border-color:var(--ink)}
+.chip.k{border-color:var(--c);background:color-mix(in srgb,var(--c) 15%,var(--surface))}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font:500 14px var(--font-ui);color:var(--muted);padding:0 4px;max-width:100%}
+.jumplist{display:flex;flex-direction:column;gap:6px}
+.jumpitem{display:flex;justify-content:space-between;align-items:baseline;gap:12px;width:100%;text-align:left;font:600 16px var(--font-ui);color:var(--ink);background:var(--surface);border:1.5px solid var(--rule);border-radius:5px;padding:8px 10px;cursor:pointer}
+.jumpitem:hover{border-color:var(--ink)}
+.jumpitem span{font-weight:500;font-size:14px;color:var(--muted);white-space:nowrap}
+.focusbar{margin-top:8px !important}
+.legend span{white-space:nowrap}
+.sw{display:inline-block;width:20px;height:11px;vertical-align:-1px;margin-right:6px;border:1.5px solid var(--c);background:color-mix(in srgb,var(--c) 24%,var(--surface));border-radius:2px}
+.sw.hatch{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c) 60%,transparent) 0 2px,transparent 2px 5px)}
+.sw.window{border-style:dashed;background:color-mix(in srgb,var(--c) 8%,var(--surface))}
+.sw.ghost{border-style:dotted;background:none}
+.sw.line{width:0;height:14px;border:0;border-left:2px dotted var(--ink);background:none;margin-right:8px;vertical-align:-3px}
+
+/* Chart */
+main{flex:1 1 auto;min-height:0;display:flex}
+#chart{flex:1 1 auto;min-width:0;overflow:auto;position:relative;background:var(--surface);border-top:2px solid var(--ink);overscroll-behavior:contain}
+.canvas{position:relative;padding-bottom:28px}
+.row{display:flex;height:var(--rh)}
+.row .lab{position:sticky;left:0;z-index:3;width:var(--lw);flex:0 0 var(--lw);background:var(--surface);border-right:2px solid var(--ink);padding:0 8px;display:flex;align-items:center;gap:6px;font:600 14px var(--font-ui);white-space:nowrap;overflow:hidden;cursor:default}
+.row .lab .ld{font-weight:500;color:var(--muted);font-size:13px}
+.row .lab.click{cursor:pointer}
+.row .lab.click:hover .ln{text-decoration:underline}
+.row .track{position:relative;z-index:2;flex:0 0 auto}
+.row.gh{height:32px}
+.row.gh .lab{font-weight:700;font-size:16px;align-items:flex-end;padding-bottom:4px}
+.row.gh .track,.row.gfirst .track{border-top:1.5px solid var(--ink)}
+.row.gh .lab,.row.gfirst .lab{border-top:1.5px solid var(--ink)}
+.row.gfirst .lab{align-items:flex-start;padding-top:5px;font-weight:700;font-size:15px;white-space:normal;line-height:1}
+.axis{position:sticky;top:0;z-index:6;height:32px;background:var(--surface);border-bottom:2px solid var(--ink)}
+.axis .lab{z-index:7;font-weight:600;color:var(--muted)}
+.axis .track{z-index:6;background:var(--surface)}
+.tick{position:absolute;top:0;bottom:0;border-left:1.5px solid var(--ink);font:600 13px var(--font-ui);padding:7px 0 0 4px;white-space:nowrap}
+.tick.minor{border-left:1px solid var(--rule);top:20px}
+.overlay{position:absolute;top:0;bottom:0;z-index:1;pointer-events:none}
+.prezone{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(90deg,transparent 0 6px,color-mix(in srgb,var(--ink) 4%,transparent) 6px 7px);border-right:3px double var(--ink)}
+.tick.pre{border-left:0;color:var(--muted);font-weight:500}
+.gl{position:absolute;top:0;bottom:0;border-left:1px solid var(--grid)}
+.evl{position:absolute;top:0;bottom:0;border-left:2px dotted color-mix(in srgb,var(--ink) 28%,transparent)}
+.evl.major{border-left-color:color-mix(in srgb,var(--ink) 70%,transparent)}
+#hover{position:absolute;top:0;bottom:0;border-left:1px solid var(--accent);display:none}
+#pin{position:absolute;top:0;bottom:0;border-left:2px solid var(--accent);display:none}
+.htag{position:absolute;top:5px;transform:translateX(-50%);background:var(--accent);color:var(--surface);font:600 13px var(--font-ui);padding:2px 6px;border-radius:3px;pointer-events:none;display:none;white-space:nowrap;z-index:2}
+
+.bar{position:absolute;top:3px;height:calc(var(--rh) - 6px);border:1.5px solid var(--c);background:color-mix(in srgb,var(--c) 24%,var(--surface));color:var(--ink);border-radius:3px;padding:0;margin:0;font:600 13px var(--font-ui);cursor:pointer;display:block;overflow:visible}
+.bar:hover{background:color-mix(in srgb,var(--c) 40%,var(--surface))}
+.bar .co{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c) 60%,transparent) 0 2px,transparent 2px 6px);border-right:1.5px solid var(--c);pointer-events:none}
+.bar .t{position:absolute;left:6px;top:50%;transform:translateY(-50%);white-space:nowrap;pointer-events:none;z-index:1}
+.bar .t.out{left:calc(100% + 5px)}
+.bar.window{border-style:dashed;background:color-mix(in srgb,var(--c) 9%,var(--surface))}
+.bar.ghost{border-style:dotted;background:transparent;color:var(--muted)}
+.bar.era{border:2px solid var(--era);background:var(--surface);font-weight:700;font-size:14px}
+.bar.era .t.in{left:50%;transform:translate(-50%,-50%)}
+.bar.dim,.ev.dim{opacity:.2}
+.bar.sel{outline:2.5px solid var(--ink);outline-offset:1px;z-index:4}
+.ev{position:absolute;top:3px;height:calc(var(--rh) - 6px);background:none;border:0;padding:0 0 0 15px;margin:0;font:600 13px var(--font-ui);color:var(--ink);cursor:pointer;white-space:nowrap}
+.ev::before{content:"";position:absolute;left:1.5px;top:50%;width:9px;height:9px;background:var(--ink);transform:translateY(-50%) rotate(45deg)}
+.ev.minor::before{background:var(--surface);border:1.5px solid var(--ink);width:7px;height:7px}
+.ev.sel{text-decoration:underline;text-decoration-thickness:2px}
+.ev:hover{text-decoration:underline}
+
+/* Panel */
+#panel{flex:0 0 390px;max-width:44vw;overflow:auto;background:var(--surface);border-top:2px solid var(--ink);border-left:3px solid var(--ink);padding:14px 20px 28px;font-size:16px;line-height:1.6}
+#panel[hidden]{display:none}
+.p-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.p-kicker{font:600 15px var(--font-ui);color:var(--muted);margin-top:4px}
+#panel h2{font:700 32px/1 var(--font-ui);margin:4px 0 8px}
+.p-dates{font:600 19px/1.25 var(--font-ui)}
+.p-alt{font:500 15px var(--font-ui);color:var(--muted);margin-top:2px}
+.pill{display:inline-block;font:600 14px var(--font-ui);padding:1px 9px;border-radius:999px;border:1.5px solid var(--c);background:color-mix(in srgb,var(--c) 18%,var(--surface));margin-right:6px}
+dl.facts{display:grid;grid-template-columns:max-content 1fr;gap:5px 14px;margin:14px 0 6px}
+dl.facts dt{font:600 15px var(--font-ui);color:var(--muted);padding-top:2px}
+dl.facts dd{margin:0}
+.p-note{margin:10px 0 0}
+.p-sec h3{font:700 17px var(--font-ui);margin:20px 0 8px;padding-bottom:3px;border-bottom:1.5px solid var(--ink)}
+.p-sec h4{font:600 15px var(--font-ui);color:var(--muted);margin:10px 0 6px}
+.refs{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 14px}
+.refs a{color:var(--accent);text-underline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.p-help{color:var(--muted);font-size:15px}
+#panel p{margin:0 0 10px}
+#panel ul.plain{padding-left:18px;margin:0 0 10px}
+#panel ul.plain li{margin-bottom:4px}
+
+@media (max-width:760px){
+  .top{padding:12px 14px 10px}
+  .tools,.drawer{padding-left:14px;padding-right:14px}
+  input[type="search"]{width:130px}
+  .views .seg button{font-size:16px;padding:7px 12px}
+  .brand svg{width:42px;height:42px}
+  .brand{gap:10px}
+  .pop{left:12px !important}
+  .focusbar{margin:0 14px 8px}
+  body{display:block;height:auto}
+  main{display:block}
+  #chart{height:78vh;height:78dvh}
+  .sub{font-size:14px}
+  #panel{position:fixed;left:0;right:0;bottom:0;max-width:none;max-height:64vh;border-left:0;border-top:3px solid var(--ink);z-index:20;padding:12px 16px calc(24px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 28px rgba(0,0,0,.22)}
+}
+@media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto !important} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Cross with a scroll">
+      <circle cx="32" cy="22" r="12.5" fill="none" stroke="var(--judah)" stroke-width="2.6"/>
+      <g fill="var(--ink)">
+        <rect x="28.8" y="6" width="6.4" height="50" rx="1"/>
+        <rect x="12" y="18.8" width="40" height="6.4" rx="1"/>
+        <circle cx="32" cy="4.2" r="3.1"/><circle cx="28.6" cy="7.6" r="2.6"/><circle cx="35.4" cy="7.6" r="2.6"/>
+        <circle cx="9.8" cy="22" r="3.1"/><circle cx="13.2" cy="18.6" r="2.6"/><circle cx="13.2" cy="25.4" r="2.6"/>
+        <circle cx="54.2" cy="22" r="3.1"/><circle cx="50.8" cy="18.6" r="2.6"/><circle cx="50.8" cy="25.4" r="2.6"/>
+        <path d="M24 56h16l3 5H21z"/>
+      </g>
+      <path d="M10 38.5c8-3.5 15-3 22 0s14 3.5 22 0v8c-8 3.5-15 3-22 0s-14-3.5-22 0z" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M10 38.5c-3.6 0-4.8 4.2-2.6 6.4 1.5 1.5 3.6.6 3.4-1.1-.2-1.3-1.8-1.6-2.4-.6" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M54 46.5c3.6 0 4.8-4.2 2.6-6.4-1.5-1.5-3.6-.6-3.4 1.1.2 1.3 1.8 1.6 2.4.6" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M16 41.3c5-1.6 10-1.4 16 .6s11 2.2 16 .6M16 44.3c5-1.6 10-1.4 16 .6" fill="none" stroke="var(--judah)" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1>Creation to Revelation</h1>
+      <p class="sub">Patriarchs, kings, prophets, apostles, and empires, creation to AD 100. Tap a bar for details, or empty space for a year snapshot.</p>
+    </div>
+  </div>
+  <div class="views">
+    <div class="viewrow">
+    <div class="seg" id="viewSeg" role="group" aria-label="Level of detail">
+      <button data-v="o" aria-pressed="false">Overview</button>
+      <button data-v="s" aria-pressed="true">Standard</button>
+      <button data-v="d" aria-pressed="false">Detailed</button>
+    </div>
+    <div class="seg" id="layoutSeg" role="group" aria-label="Layout">
+      <button data-l="compact" aria-pressed="false">Compact</button>
+      <button data-l="rows" aria-pressed="false">One per row</button>
+    </div>
+    <div class="zoom">
+      <button class="btn sq" id="zoomOut" aria-label="Zoom out">−</button>
+      <button class="btn sq" id="zoomIn" aria-label="Zoom in">+</button>
+      <button class="btn" id="zoomFit">Fit</button>
+    </div>
+    <button class="btn" id="aboutBtn">About</button>
+    <button class="btn sq theme" id="themeBtn" aria-label="Switch to dark mode" title="Switch to dark mode">
+      <svg class="i-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z" fill="currentColor"/></svg>
+      <svg class="i-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1.8v2.6M12 19.6v2.6M1.8 12h2.6M19.6 12h2.6M4.8 4.8l1.8 1.8M17.4 17.4l1.8 1.8M4.8 19.2l1.8-1.8M17.4 6.6l1.8-1.8"/></g></svg>
+    </button>
+    </div>
+    <small id="viewHint"></small>
+  </div>
+</header>
+
+<div class="tools">
+  <label class="field">Color by
+    <select id="colorBy">
+      <option value="kingdom">Kingdom</option>
+      <option value="verdict">Verdict</option>
+      <option value="dynasty">Dynasty</option>
+    </select>
+  </label>
+  <div class="legend" id="legend"></div>
+  <label class="field">Book
+    <select id="bookSel"><option value="">All books</option></select>
+  </label>
+  <input type="search" id="q" placeholder="Search names, notes" aria-label="Search">
+  <button class="btn" id="jumpBtn" aria-expanded="false" aria-controls="jumpPop">Jump to</button>
+  <button class="btn" id="lanesBtn" aria-expanded="false" aria-controls="lanesPop">Lanes</button>
+  <button class="btn" id="filtersBtn" aria-expanded="false" aria-controls="drawer">Filters</button>
+</div>
+
+<div class="drawer" id="drawer" hidden>
+  <fieldset>
+    <legend>Verdict on the kings</legend>
+    <label class="opt"><input type="checkbox" data-verdict="right" checked> Did right</label>
+    <label class="opt"><input type="checkbox" data-verdict="mixed" checked> Mixed</label>
+    <label class="opt"><input type="checkbox" data-verdict="evil" checked> Did evil</label>
+  </fieldset>
+  <fieldset>
+    <legend>Prophets sent to</legend>
+    <label class="opt"><input type="checkbox" data-aud="israel" checked> Israel</label>
+    <label class="opt"><input type="checkbox" data-aud="judah" checked> Judah</label>
+    <label class="opt"><input type="checkbox" data-aud="nations" checked> The nations</label>
+    <label class="opt"><input type="checkbox" data-aud="exile" checked> Exiles &amp; returnees</label>
+  </fieldset>
+  <fieldset>
+    <legend>Debated dates</legend>
+    <label class="opt"><input type="checkbox" id="altToggle"> Show alternate dates</label>
+    <p class="note">Adds dotted bars for later datings of Obadiah and Joel, an AD 33 crucifixion, and an early Revelation.</p>
+  </fieldset>
+</div>
+
+<div class="focusbar" id="focusbar" hidden></div>
+<div class="pop" id="lanesPop" hidden role="dialog" aria-label="Lanes"></div>
+<div class="pop" id="jumpPop" hidden role="dialog" aria-label="Jump to an era"></div>
+<div class="pop legend-full" id="legendPop" hidden role="dialog" aria-label="Full legend"></div>
+
+<main>
+  <div id="chart" tabindex="0" aria-label="Timeline chart"><div class="canvas" id="canvas"></div></div>
+  <aside id="panel" hidden aria-live="polite"></aside>
+</main>
+
+<script>
+"use strict";
+const MAXY = 2200, MINY = -100, SPAN = MAXY - MINY, PRE_W = 200;
+const UIFONT = '"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif';
+
+/* ---------- Data ---------- */
+const D = [], byId = {};
+function add(o){ o.views = o.views || "sd"; D.push(o); byId[o.id] = o; }
+function K(group, id, name, start, end, o){ add(Object.assign({kind:"king", group, id, name, start, end}, o)); }
+function P(id, name, start, end, aud, o, group, views){ add(Object.assign({kind:"prophet", group:group||"prophets", id, name, start, end, aud, views:views||"osd"}, o)); }
+function OP(id, name, start, end, aud, o){ P(id, name, start, end, aud, o, "oprophets", "d"); }
+function E(id, year, name, refs, views, o){ add(Object.assign({kind:"event", group:"events", id, name, start:year, end:year, refs, views}, o)); }
+function B(id, name, start, end, cat, views, o){ add(Object.assign({kind:"book", group:"books", id, name, start, end, cat, views, book:name}, o)); }
+function ERA(id, name, start, end, o){ add(Object.assign({kind:"era", group:"era", id, name, start, end, views:"osd"}, o)); }
+function M(id, name, emp, start, end, refs, o){ add(Object.assign({kind:"empire", group:"empires", id, name, emp, start, end, refs, views:"d"}, o)); }
+function L(id, name, start, end, refs, note){ add({kind:"leader", group:"leaders", id, name, start, end, refs, note, views:"d"}); }
+
+/* Eras */
+ERA("era-united", "United kingdom", 1051, 931, {note:"Saul, David, and Solomon reign over all twelve tribes.", refs:"1 Sam 10:1; 1 Kgs 11:42"});
+ERA("era-divided", "Divided kingdom", 931, 723, {note:"Ten northern tribes follow Jeroboam (Israel); Judah and Benjamin stay with David’s house (Judah). Ends with Samaria’s fall to Assyria in 723/722.", refs:"1 Kgs 12:16–20; 2 Kgs 17:6"});
+ERA("era-alone", "Judah alone", 723, 587, {aka:"The surviving kingdom", note:"Judah outlasts Israel by about 136 years. Babylon begins deporting Judeans in 605.", refs:"2 Kgs 18–25"});
+ERA("era-exile", "Exile", 587, 538, {aka:"Babylonian captivity", note:"Jerusalem and the temple are destroyed. Jeremiah’s “seventy years” (Jer 25:11; 29:10) is often counted from the first deportation in 605 to the return around 536.", refs:"2 Kgs 25; 2 Chr 36:20–21; Dan 9:2"});
+ERA("era-restore", "Restoration", 538, 430, {note:"Exiles return under Zerubbabel, Ezra, and Nehemiah; the temple and walls are rebuilt.", refs:"Ezra 1:1–4; Neh 6:15"});
+
+/* Overview summaries */
+add({kind:"summary", group:"united", id:"sum-united", name:"Saul, David, Solomon", start:1051, end:931, views:"o", note:"Three kings over all Israel, about 40 years each (Acts 13:21; 2 Sam 5:4; 1 Kgs 11:42). Switch to Standard to see each reign.", refs:"1 Sam 9–1 Kgs 11; 1 Chr 10–2 Chr 9"});
+add({kind:"summary", group:"judah", id:"sum-judah", name:"19 kings and 1 queen, one dynasty", start:931, end:587, views:"o", note:"Every king of Judah descended from David; only Athaliah broke the line, and only for six years. Eight are said to have done right in the eyes of the LORD. Switch to Standard to see each reign.", refs:"1 Kgs 12–2 Kgs 25; 2 Chr 10–36"});
+add({kind:"summary", group:"israel", id:"sum-israel", name:"19 kings, 9 dynasties", start:931, end:723, views:"o", note:"Every king of Israel did evil in the eyes of the LORD, following Jeroboam’s golden calves. Eight kings were assassinated or took their own life. Switch to Standard to see each reign.", refs:"1 Kgs 12–2 Kgs 17"});
+
+/* United kingdom */
+K("united","saul","Saul",1051,1009,{verdict:"evil",verdictRef:"1 Sam 15:23; 1 Chr 10:13",dynasty:"Saul",years:"40 (Acts 13:21)",ended:"Died in battle on Mount Gilboa",refs:"1 Sam 9–31; 1 Chr 10; Acts 13:21",note:"Dates are approximate: Scripture gives no synchronisms for Saul, and the Hebrew text of 1 Sam 13:1 is incomplete."});
+K("united","david","David",1009,969,{verdict:"right",verdictRef:"1 Kgs 15:5; Acts 13:22",dynasty:"David",years:"40: 7½ in Hebron, 33 in Jerusalem (2 Sam 5:4–5)",ended:"Died after installing Solomon as coregent (1 Kgs 1)",refs:"1 Sam 16–1 Kgs 2:11; 1 Chr 11–29; Ps 51",note:"God’s covenant with David (2 Sam 7) promised a throne forever, fulfilled in Christ, the Son of David (Luke 1:32–33). Dates approximate."});
+K("united","solomon","Solomon",969,931,{coStart:971,verdict:"mixed",verdictRef:"1 Kgs 3:3; 11:4–6",dynasty:"David",years:"40 (1 Kgs 11:42)",ended:"Died; the kingdom divided under his son",refs:"1 Kgs 1–11; 2 Chr 1–9",note:"Built the temple, begun in his fourth year, spring 967 (1 Kgs 6:1). His foreign wives turned his heart, and God tore ten tribes from his son (1 Kgs 11:11–13)."});
+
+/* Judah */
+K("judah","rehoboam","Rehoboam",931,914,{verdict:"evil",verdictRef:"2 Chr 12:14",dynasty:"David",years:"17 (1 Kgs 14:21)",ended:"Died",refs:"1 Kgs 12:1–24; 14:21–31; 2 Chr 10–12",note:"His harsh answer split the kingdom (1 Kgs 12:13–16). Shishak of Egypt plundered Jerusalem in his fifth year."});
+K("judah","abijah","Abijah",914,911,{aka:"Abijam",verdict:"evil",verdictRef:"1 Kgs 15:3",dynasty:"David",years:"3 (1 Kgs 15:2)",ended:"Died",refs:"1 Kgs 15:1–8; 2 Chr 13",note:"Defeated Jeroboam at Mount Zemaraim, relying on the LORD in that battle (2 Chr 13:18)."});
+K("judah","asa","Asa",911,870,{verdict:"right",verdictRef:"1 Kgs 15:11",dynasty:"David",years:"41 (1 Kgs 15:10)",ended:"Died of a disease in his feet",refs:"1 Kgs 15:9–24; 2 Chr 14–16",note:"Removed idols and deposed his grandmother Maacah. Late in life he relied on Syria and on physicians rather than the LORD (2 Chr 16)."});
+K("judah","jehoshaphat","Jehoshaphat",870,848,{coStart:873,verdict:"right",verdictRef:"1 Kgs 22:43",dynasty:"David",years:"25 (1 Kgs 22:42)",ended:"Died",refs:"1 Kgs 22:41–50; 2 Chr 17–20",note:"Sent Levites through Judah to teach the Law (2 Chr 17:7–9). His alliance with Ahab drew a rebuke from Jehu son of Hanani (2 Chr 19:2)."});
+K("judah","jehoram","Jehoram",848,841,{coStart:854,aka:"Joram",verdict:"evil",verdictRef:"2 Kgs 8:18",dynasty:"David",years:"8 (2 Kgs 8:17)",ended:"Died of a bowel disease, unmourned (2 Chr 21:18–20)",refs:"2 Kgs 8:16–24; 2 Chr 21",note:"Married Athaliah, daughter of Ahab. Edom revolted in his days. Received a letter of judgment from Elijah (2 Chr 21:12–15)."});
+K("judah","ahaziah-j","Ahaziah",841,841,{verdict:"evil",verdictRef:"2 Kgs 8:27",dynasty:"David",years:"1 (2 Kgs 8:26)",ended:"Killed by Jehu’s men",refs:"2 Kgs 8:25–9:29; 2 Chr 22:1–9",note:"Son of Athaliah; walked in the ways of Ahab’s house."});
+K("judah","athaliah","Athaliah",841,835,{verdict:"evil",verdictRef:"2 Chr 24:7",dynasty:"Omri",years:"6 (2 Kgs 11:3)",ended:"Executed in a coup led by Jehoiada the priest",refs:"2 Kgs 11; 2 Chr 22:10–23:21",note:"The only queen to rule either kingdom, and a daughter of Ahab’s house. She tried to destroy David’s royal line; the infant Joash was hidden in the temple for six years."});
+K("judah","joash","Joash",835,796,{aka:"Jehoash",verdict:"mixed",verdictRef:"2 Kgs 12:2; 2 Chr 24:17–22",dynasty:"David",years:"40 (2 Kgs 12:1)",ended:"Assassinated by his servants",refs:"2 Kgs 11–12; 2 Chr 22:11–24:27",note:"Did right while Jehoiada the priest lived and repaired the temple. Afterward he turned to idols and had Jehoiada’s son Zechariah stoned."});
+K("judah","amaziah","Amaziah",796,767,{verdict:"mixed",verdictRef:"2 Chr 25:2",dynasty:"David",years:"29 (2 Kgs 14:2)",ended:"Assassinated at Lachish",refs:"2 Kgs 14:1–22; 2 Chr 25",note:"Did right, “yet not with a whole heart.” Defeated Edom, then brought home Edom’s gods; provoked Jehoash of Israel and was captured."});
+K("judah","uzziah","Uzziah",767,740,{coStart:791,aka:"Azariah",verdict:"right",verdictRef:"2 Kgs 15:3",dynasty:"David",years:"52 (2 Kgs 15:2)",ended:"Died a leper",refs:"2 Kgs 15:1–7; 2 Chr 26; Isa 6:1",note:"Prospered greatly, but in pride burned incense in the temple and was struck with leprosy (2 Chr 26:16–21). Isaiah saw the Lord in the year he died."});
+K("judah","jotham","Jotham",740,732,{coStart:750,verdict:"right",verdictRef:"2 Kgs 15:34",dynasty:"David",years:"16 (2 Kgs 15:33)",ended:"Died; Ahaz had already been installed in 735",refs:"2 Kgs 15:32–38; 2 Chr 27",note:"Governed for his leprous father (2 Kgs 15:5). A pro-Assyrian party put Ahaz forward in 735, though Jotham lived until 732 (2 Kgs 15:30)."});
+K("judah","ahaz","Ahaz",732,716,{coStart:735,verdict:"evil",verdictRef:"2 Kgs 16:2–3",dynasty:"David",years:"16 (2 Kgs 16:2)",ended:"Died",refs:"2 Kgs 16; 2 Chr 28; Isa 7",note:"Refused Isaiah’s sign and bought Assyria’s help against Israel and Syria. The Immanuel prophecy was spoken to him (Isa 7:14)."});
+K("judah","hezekiah","Hezekiah",716,687,{coStart:729,verdict:"right",verdictRef:"2 Kgs 18:3, 5",dynasty:"David",years:"29 (2 Kgs 18:2)",ended:"Died",refs:"2 Kgs 18–20; 2 Chr 29–32; Isa 36–39; Prov 25:1",note:"Cleansed the temple and restored the Passover. The LORD delivered Jerusalem from Sennacherib in 701 (2 Kgs 19:35) and added fifteen years to his life (2 Kgs 20:6)."});
+K("judah","manasseh","Manasseh",687,643,{coStart:697,verdict:"evil",verdictRef:"2 Kgs 21:2",dynasty:"David",years:"55 (2 Kgs 21:1)",ended:"Died",refs:"2 Kgs 21:1–18; 2 Chr 33:1–20",note:"The longest and most wicked reign in Judah; his sins sealed the coming judgment (2 Kgs 23:26). Yet he humbled himself in captivity and was restored (2 Chr 33:12–13)."});
+K("judah","amon","Amon",643,641,{verdict:"evil",verdictRef:"2 Kgs 21:20",dynasty:"David",years:"2 (2 Kgs 21:19)",ended:"Assassinated by his servants",refs:"2 Kgs 21:19–26; 2 Chr 33:21–25"});
+K("judah","josiah","Josiah",641,609,{verdict:"right",verdictRef:"2 Kgs 22:2; 23:25",dynasty:"David",years:"31 (2 Kgs 22:1)",ended:"Killed by Pharaoh Neco at Megiddo",refs:"2 Kgs 22:1–23:30; 2 Chr 34–35",note:"Crowned at eight. The Book of the Law was found in his eighteenth year (622), and he led the most sweeping reform in Judah’s history."});
+K("judah","jehoahaz-j","Jehoahaz",609,609,{aka:"Shallum (Jer 22:11)",verdict:"evil",verdictRef:"2 Kgs 23:32",dynasty:"David",years:"3 months (2 Kgs 23:31)",ended:"Deposed by Neco and taken to Egypt",refs:"2 Kgs 23:31–34; 2 Chr 36:1–4"});
+K("judah","jehoiakim","Jehoiakim",609,598,{verdict:"evil",verdictRef:"2 Kgs 23:37",dynasty:"David",years:"11 (2 Kgs 23:36)",ended:"Died as Babylon moved against Jerusalem",refs:"2 Kgs 23:34–24:7; 2 Chr 36:5–8; Jer 36",note:"Placed on the throne by Neco, then became Nebuchadnezzar’s vassal. Cut up and burned Jeremiah’s scroll (Jer 36:23)."});
+K("judah","jehoiachin","Jehoiachin",598,597,{aka:"Jeconiah, Coniah",verdict:"evil",verdictRef:"2 Kgs 24:9",dynasty:"David",years:"3 months (2 Kgs 24:8)",ended:"Taken captive to Babylon with Ezekiel",refs:"2 Kgs 24:8–17; 25:27–30; 2 Chr 36:9–10; Matt 1:12",note:"Released from prison in Babylon in 561 (2 Kgs 25:27), a sign that David’s line was not extinguished. He appears in Christ’s genealogy."});
+K("judah","zedekiah","Zedekiah",597,587,{verdict:"evil",verdictRef:"2 Kgs 24:19",dynasty:"David",years:"11 (2 Kgs 24:18)",ended:"Blinded and carried to Babylon; Jerusalem destroyed",refs:"2 Kgs 24:17–25:7; 2 Chr 36:11–21; Jer 37–39; 52",note:"Installed by Nebuchadnezzar and rebelled despite Jeremiah’s warnings. Young dates the fall to 587; Thiele and many charts use 586."});
+
+/* Israel */
+K("israel","jeroboam1","Jeroboam I",931,910,{verdict:"evil",verdictRef:"1 Kgs 14:9",dynasty:"Jeroboam",years:"22 (1 Kgs 14:20)",ended:"Died; his son ruled two years",refs:"1 Kgs 11:26–14:20; 2 Chr 13",note:"Set up golden calves at Bethel and Dan (1 Kgs 12:28–30). “The sins of Jeroboam” became the refrain for nearly every northern king."});
+K("israel","nadab","Nadab",910,909,{verdict:"evil",verdictRef:"1 Kgs 15:26",dynasty:"Jeroboam",years:"2 (1 Kgs 15:25)",ended:"Assassinated by Baasha",refs:"1 Kgs 15:25–31"});
+K("israel","baasha","Baasha",909,886,{verdict:"evil",verdictRef:"1 Kgs 15:34",dynasty:"Baasha",years:"24 (1 Kgs 15:33)",ended:"Died",refs:"1 Kgs 15:16–16:7; 2 Chr 16:1–6",note:"Wiped out Jeroboam’s house, fulfilling Ahijah’s word (1 Kgs 15:29), then walked in the same sins."});
+K("israel","elah","Elah",886,885,{verdict:"evil",verdictRef:"1 Kgs 16:13",dynasty:"Baasha",years:"2 (1 Kgs 16:8)",ended:"Assassinated by Zimri while drunk",refs:"1 Kgs 16:8–14"});
+K("israel","zimri","Zimri",885,885,{verdict:"evil",verdictRef:"1 Kgs 16:19",dynasty:"Zimri",years:"7 days (1 Kgs 16:15)",ended:"Burned the palace over himself",refs:"1 Kgs 16:9–20"});
+K("israel","tibni","Tibni",885,880,{verdict:"none",dynasty:"Tibni",years:"Not stated",ended:"Died; Omri became sole king",refs:"1 Kgs 16:21–22",note:"Half the people followed Tibni and half followed Omri. Scripture gives him no verdict."});
+K("israel","omri","Omri",880,874,{coStart:885,coKind:"rival",verdict:"evil",verdictRef:"1 Kgs 16:25",dynasty:"Omri",years:"12 (1 Kgs 16:23)",ended:"Died",refs:"1 Kgs 16:15–28",note:"Built Samaria as the capital. Assyrian records kept calling Israel “the house of Omri” long after his dynasty fell."});
+K("israel","ahab","Ahab",874,853,{verdict:"evil",verdictRef:"1 Kgs 16:30, 33",dynasty:"Omri",years:"22 (1 Kgs 16:29)",ended:"Killed in battle at Ramoth-gilead, as Micaiah foretold",refs:"1 Kgs 16:29–22:40; 2 Chr 18",note:"Married Jezebel and promoted Baal worship; confronted by Elijah on Mount Carmel (1 Kgs 18). Assyrian records place him at the Battle of Qarqar in 853."});
+K("israel","ahaziah-i","Ahaziah",853,852,{verdict:"evil",verdictRef:"1 Kgs 22:52",dynasty:"Omri",years:"2 (1 Kgs 22:51)",ended:"Died after a fall, as Elijah foretold",refs:"1 Kgs 22:51–2 Kgs 1:18"});
+K("israel","joram","Joram",852,841,{aka:"Jehoram",verdict:"evil",verdictRef:"2 Kgs 3:2",dynasty:"Omri",years:"12 (2 Kgs 3:1)",ended:"Killed by Jehu",refs:"2 Kgs 3:1–9:26",note:"Removed Baal’s pillar but kept Jeroboam’s calves. Much of Elisha’s ministry falls in his reign."});
+K("israel","jehu","Jehu",841,814,{verdict:"mixed",verdictRef:"2 Kgs 10:30–31",dynasty:"Jehu",years:"28 (2 Kgs 10:36)",ended:"Died",refs:"2 Kgs 9–10",note:"Anointed at Elisha’s word; destroyed Ahab’s house and Baal worship but kept the calves. God promised his sons the throne to the fourth generation (2 Kgs 10:30). Shown paying tribute on Shalmaneser III’s Black Obelisk."});
+K("israel","jehoahaz-i","Jehoahaz",814,798,{verdict:"evil",verdictRef:"2 Kgs 13:2",dynasty:"Jehu",years:"17 (2 Kgs 13:1)",ended:"Died",refs:"2 Kgs 13:1–9",note:"Oppressed by Hazael of Syria; he sought the LORD, who gave Israel a deliverer (2 Kgs 13:4–5)."});
+K("israel","jehoash","Jehoash",798,782,{aka:"Joash",verdict:"evil",verdictRef:"2 Kgs 13:11",dynasty:"Jehu",years:"16 (2 Kgs 13:10)",ended:"Died",refs:"2 Kgs 13:10–25; 14:8–16",note:"Wept over the dying Elisha. Defeated Amaziah of Judah and broke down part of Jerusalem’s wall."});
+K("israel","jeroboam2","Jeroboam II",782,753,{coStart:793,verdict:"evil",verdictRef:"2 Kgs 14:24",dynasty:"Jehu",years:"41 (2 Kgs 14:23)",ended:"Died",refs:"2 Kgs 14:23–29",note:"Restored Israel’s borders as Jonah had prophesied (2 Kgs 14:25). Prosperity masked the injustice that Amos and Hosea condemned."});
+K("israel","zechariah-k","Zechariah",753,752,{verdict:"evil",verdictRef:"2 Kgs 15:9",dynasty:"Jehu",years:"6 months (2 Kgs 15:8)",ended:"Assassinated by Shallum, ending Jehu’s line as promised (2 Kgs 15:12)",refs:"2 Kgs 15:8–12"});
+K("israel","shallum","Shallum",752,752,{verdict:"none",dynasty:"Shallum",years:"1 month (2 Kgs 15:13)",ended:"Assassinated by Menahem",refs:"2 Kgs 15:10–15",note:"Scripture gives him no verdict."});
+K("israel","menahem","Menahem",752,742,{verdict:"evil",verdictRef:"2 Kgs 15:18",dynasty:"Menahem",years:"10 (2 Kgs 15:17)",ended:"Died",refs:"2 Kgs 15:14–22",note:"Paid a heavy tribute to Tiglath-pileser III, called Pul (2 Kgs 15:19)."});
+K("israel","pekahiah","Pekahiah",742,740,{verdict:"evil",verdictRef:"2 Kgs 15:24",dynasty:"Menahem",years:"2 (2 Kgs 15:23)",ended:"Assassinated by Pekah",refs:"2 Kgs 15:23–26"});
+K("israel","pekah","Pekah",740,732,{coStart:752,coKind:"rival",verdict:"evil",verdictRef:"2 Kgs 15:28",dynasty:"Pekah",years:"20 (2 Kgs 15:27)",ended:"Assassinated by Hoshea",refs:"2 Kgs 15:25–31; 16:5; 2 Chr 28:5–8; Isa 7:1–9",note:"His twenty years count from 752, when he apparently ruled a rival realm beside Menahem (Thiele, Young; compare Hos 5:5). Joined Syria against Ahaz."});
+K("israel","hoshea","Hoshea",732,723,{verdict:"evil",verdictRef:"2 Kgs 17:2",dynasty:"Hoshea",years:"9 (2 Kgs 17:1)",ended:"Imprisoned by Shalmaneser V; Israel exiled to Assyria",refs:"2 Kgs 15:30; 17:1–6",note:"Did evil, “yet not as the kings of Israel before him.” He looked to Egypt and stopped paying tribute; Samaria fell after a three-year siege."});
+
+/* Writing prophets */
+P("obadiah","Obadiah",848,841,"nations",{book:"Obadiah",window:true,alt:[587,553,"after Jerusalem’s fall"],refs:"Obad 1–21; 2 Kgs 8:20–22; 2 Chr 21:16–17",note:"Judgment on Edom for gloating over Jerusalem’s disaster. The early view ties it to the raid on Jerusalem under Jehoram (2 Chr 21:16–17), as the handout does; many scholars date it after 587."});
+P("joel","Joel",835,796,"judah",{book:"Joel",window:true,alt:[515,400,"post-exilic view"],refs:"Joel 1–3; Acts 2:16–21",note:"The Day of the LORD and the promised outpouring of the Spirit, quoted by Peter at Pentecost. Undated; the early view fits Joash’s boyhood, when priests and elders led."});
+P("jonah","Jonah",793,753,"nations",{book:"Jonah",window:true,refs:"Jonah 1–4; 2 Kgs 14:25; Matt 12:39–41",note:"Prophesied Israel’s expansion under Jeroboam II, then was sent to call Nineveh to repentance. Jesus pointed to him as a sign of His own resurrection."});
+P("amos","Amos",763,755,"israel",{book:"Amos",refs:"Amos 1:1; 7:10–15",note:"A herdsman from Tekoa in Judah, sent north to Bethel “two years before the earthquake,” in the days of Uzziah and Jeroboam II."});
+P("hosea","Hosea",755,715,"israel",{book:"Hosea",refs:"Hos 1:1; 3:1–5",note:"His marriage to unfaithful Gomer pictured the LORD’s steadfast love for unfaithful Israel. Ministered from Jeroboam II into Hezekiah’s reign."});
+P("isaiah","Isaiah",740,681,"judah",{book:"Isaiah",refs:"Isa 1:1; 6:1–8; 37:38; 2 Kgs 19–20",note:"Called in the year Uzziah died. Records Sennacherib’s death (681). The Servant Songs point to Christ’s suffering and glory (Isa 52:13–53:12)."});
+P("micah","Micah",735,700,"judah",{book:"Micah",refs:"Mic 1:1; 5:2; Jer 26:18",note:"Spoke to both Samaria and Jerusalem under Jotham, Ahaz, and Hezekiah. Foretold the Ruler from Bethlehem (Mic 5:2; Matt 2:6)."});
+P("nahum","Nahum",663,612,"nations",{book:"Nahum",window:true,refs:"Nah 1–3; Nah 3:8",note:"Announces Nineveh’s fall. Written after Thebes fell (663, Nah 3:8) and before Nineveh fell (612)."});
+P("zephaniah","Zephaniah",640,621,"judah",{book:"Zephaniah",refs:"Zeph 1:1",note:"A descendant of Hezekiah, prophesying in Josiah’s reign, likely before the reform of 622."});
+P("jeremiah","Jeremiah",627,580,"judah",{book:"Jeremiah",extraBooks:["Lamentations"],refs:"Jer 1:1–3; 25:11; 31:31–34; 43–44",note:"Called in Josiah’s thirteenth year (627) and ministered through Jerusalem’s fall and into Egypt. Promised the new covenant (Jer 31:31–34; Heb 8). Traditionally the author of Lamentations."});
+P("habakkuk","Habakkuk",609,598,"judah",{book:"Habakkuk",window:true,refs:"Hab 1:6; 2:4; Rom 1:17",note:"Wrestles with God raising up the Chaldeans. “The righteous shall live by his faith” (Hab 2:4), the text Paul builds on in Romans 1:17."});
+P("daniel","Daniel",605,536,"exile",{book:"Daniel",refs:"Dan 1:1–6; 9:1–2; 10:1",note:"Taken to Babylon in 605 and served into Cyrus’s third year. English Bibles place Daniel with the Prophets; the Hebrew canon places it among the Writings."});
+P("ezekiel","Ezekiel",593,571,"exile",{book:"Ezekiel",refs:"Ezek 1:1–3; 29:17",note:"A priest deported with Jehoiachin in 597, called in the fifth year of exile by the Chebar canal. Last dated oracle 571."});
+P("haggai","Haggai",520,520,"return",{book:"Haggai",refs:"Hag 1:1; 2:10; Ezra 5:1",note:"Four messages between August and December 520, urging the returned exiles to finish the temple."});
+P("zechariah","Zechariah",520,518,"return",{book:"Zechariah",refs:"Zech 1:1; 7:1; 9:9; 12:10; Ezra 5:1; 6:14",note:"Haggai’s partner in rebuilding. Chapters 9–14 may come from later in his life. Rich in prophecy of Christ (Zech 9:9; 12:10)."});
+P("malachi","Malachi",440,420,"return",{book:"Malachi",window:true,refs:"Mal 1:1; 3:1; 4:5–6; Neh 13",note:"Confronts the same abuses Nehemiah faced (Neh 13), so likely his era. Closes the Old Testament looking for the coming forerunner (Mal 3:1; Matt 11:10)."});
+
+/* Other (non-writing) prophets */
+OP("samuel","Samuel",1060,1012,"all",{refs:"1 Sam 3; 7–16; 25:1",note:"Last judge and first of the prophets (Acts 3:24). Anointed Saul and David. His ministry began long before the chart starts; he died before Saul (1 Sam 25:1)."});
+OP("gad","Gad",1020,970,"all",{window:true,refs:"1 Sam 22:5; 2 Sam 24:11–19; 1 Chr 29:29",note:"David’s seer from his days as a fugitive to the end of his reign."});
+OP("nathan","Nathan",1000,967,"all",{window:true,refs:"2 Sam 7; 12:1–15; 1 Kgs 1; 1 Chr 29:29",note:"Delivered the Davidic covenant (2 Sam 7), confronted David over Bathsheba, and secured Solomon’s succession."});
+OP("ahijah","Ahijah",935,909,"israel",{window:true,refs:"1 Kgs 11:29–39; 14:1–18",note:"Tore his cloak into twelve pieces to give Jeroboam ten tribes; later foretold the end of Jeroboam’s house."});
+OP("shemaiah","Shemaiah",931,926,"judah",{window:true,refs:"1 Kgs 12:22–24; 2 Chr 11:2–4; 12:5–8",note:"Stopped Rehoboam from fighting Israel, and called him to humble himself when Shishak invaded."});
+OP("azariah-p","Azariah son of Oded",896,896,"judah",{refs:"2 Chr 15:1–8",note:"His word stirred Asa’s reform in the fifteenth year of his reign."});
+OP("jehu-p","Jehu son of Hanani",890,850,"all",{window:true,refs:"1 Kgs 16:1–7; 2 Chr 19:2–3; 20:34",note:"Pronounced judgment on Baasha, and decades later rebuked Jehoshaphat for helping Ahab."});
+OP("elijah","Elijah",865,848,"israel",{window:true,refs:"1 Kgs 17–19; 21; 2 Kgs 1–2; 2 Chr 21:12–15",note:"Confronted Ahab and the prophets of Baal; taken up by a whirlwind. Malachi promises an Elijah to come (Mal 4:5), fulfilled in John the Baptist (Matt 11:14)."});
+OP("micaiah","Micaiah",853,853,"israel",{refs:"1 Kgs 22:8–28; 2 Chr 18",note:"Alone among 400 prophets, foretold Ahab’s death at Ramoth-gilead."});
+OP("elisha","Elisha",852,797,"israel",{window:true,refs:"1 Kgs 19:16–21; 2 Kgs 2–13",note:"Succeeded Elijah with a double portion of his spirit; ministered more than fifty years and died in Jehoash’s reign (2 Kgs 13:14–20)."});
+OP("zechariah-p","Zechariah son of Jehoiada",800,797,"judah",{window:true,refs:"2 Chr 24:20–22; Luke 11:51",note:"Stoned in the temple court at Joash’s command after rebuking the people’s idolatry."});
+OP("oded","Oded",734,733,"israel",{refs:"2 Chr 28:9–15",note:"Persuaded Israel’s army to release the Judean captives taken in Pekah’s war against Ahaz."});
+OP("huldah","Huldah",622,622,"judah",{refs:"2 Kgs 22:14–20; 2 Chr 34:22–28",note:"The prophetess Josiah consulted when the Book of the Law was found."});
+OP("uriah-p","Uriah son of Shemaiah",609,605,"judah",{window:true,refs:"Jer 26:20–23",note:"Prophesied as Jeremiah did; fled to Egypt but was brought back and executed by Jehoiakim."});
+
+/* Leaders of exile and return */
+L("zerubbabel","Zerubbabel",538,515,"Ezra 2:2; 3:8; 5:2; Hag 1:1; 2:23; Zech 4:6–10","Governor of Judah from David’s line who led the first return and rebuilt the temple. Appears in Christ’s genealogy (Matt 1:12).");
+L("joshua-hp","Joshua the high priest",538,515,"Ezra 3:2; Hag 1:1; Zech 3; 6:11–13","Served beside Zerubbabel. Zechariah crowned him as a sign of the Branch who would be both priest and king.");
+L("esther","Esther & Mordecai",479,473,"Esth 2:16–17; 3:7; 9:20–32","Esther became queen in Xerxes’ seventh year. God preserved the Jews of the Persian empire from Haman’s plot, the origin of Purim.");
+L("ezra","Ezra",458,444,"Ezra 7–10; Neh 8","A priest and scribe who led a second return in Artaxerxes’ seventh year and taught the Law.");
+L("nehemiah","Nehemiah",445,430,"Neh 1:1; 2:1; 5:14; 6:15; 13:6","Cupbearer to Artaxerxes; governor who rebuilt Jerusalem’s wall in 52 days, then returned for a second term around 432.");
+
+/* Books */
+B("b-1sam","1 Samuel",1060,1009,"history","osd",{refs:"1 Sam 1–31",note:"From Samuel’s birth to Saul’s death. Its story begins before the chart’s left edge."});
+B("b-2sam","2 Samuel",1009,969,"history","osd",{refs:"2 Sam 1–24",note:"David’s reign."});
+B("b-1kgs","1 Kings",971,852,"history","osd",{refs:"1 Kgs 1–22",note:"Solomon’s accession to Ahaziah of Israel."});
+B("b-2kgs","2 Kings",852,561,"history","osd",{refs:"2 Kgs 1–25",note:"Ahaziah of Israel to Jehoiachin’s release in Babylon (2 Kgs 25:27)."});
+B("b-1chr","1 Chronicles",1009,969,"history","sd",{refs:"1 Chr 1–29",note:"Genealogies from Adam, then David’s reign."});
+B("b-2chr","2 Chronicles",971,538,"history","sd",{refs:"2 Chr 1–36",note:"Solomon to Cyrus’s decree, told from Judah’s side; the northern kings appear only where they touch Judah."});
+B("b-ezra","Ezra",538,457,"history","osd",{refs:"Ezra 1–10",note:"The first return (538) through Ezra’s reforms (458–457). A gap of almost sixty years sits between chapters 6 and 7."});
+B("b-neh","Nehemiah",445,432,"history","osd",{refs:"Neh 1–13",note:"Rebuilding the wall and renewing the covenant."});
+B("b-esth","Esther",483,473,"history","osd",{refs:"Esth 1–10",note:"Set in Susa under Xerxes (Ahasuerus), between Ezra 6 and 7."});
+B("b-ps","Psalms",1009,969,"poetry","sd",{window:true,refs:"Ps 3; 51; 90; 137",note:"The heart of the collection comes from David’s reign, but it spans from Moses (Ps 90) to the exile (Ps 137). Only the Davidic core is shown."});
+B("b-prov","Proverbs",971,700,"poetry","sd",{window:true,refs:"Prov 1:1; 25:1",note:"Mostly Solomon’s; chapters 25–29 were copied by Hezekiah’s men (Prov 25:1)."});
+B("b-eccl","Ecclesiastes",971,931,"poetry","sd",{window:true,refs:"Eccl 1:1",note:"The Preacher, son of David, king in Jerusalem; traditionally Solomon."});
+B("b-song","Song of Songs",971,931,"poetry","sd",{window:true,refs:"Song 1:1",note:"Solomon’s song."});
+B("b-lam","Lamentations",587,586,"poetry","sd",{refs:"Lam 1–5",note:"Laments over Jerusalem’s destruction, traditionally by Jeremiah."});
+
+/* World powers */
+M("shishak","Shishak","egypt",945,924,"1 Kgs 11:40; 14:25–26",{note:"Shoshenq I of Egypt. Sheltered Jeroboam, then plundered Jerusalem in Rehoboam’s fifth year."});
+M("shalmaneser3","Shalmaneser III","assyria",859,824,"",{note:"Fought Ahab at Qarqar (853) and received Jehu’s tribute (841): two fixed points that anchor the chronology."});
+M("hazael","Hazael","aram",842,796,"2 Kgs 8:7–15; 10:32; 12:17; 13:3",{note:"King of Syria, anointed at Elijah’s commission; oppressed Israel for decades."});
+M("tiglath","Tiglath-pileser III","assyria",745,727,"2 Kgs 15:19, 29; 16:7–10",{aka:"Pul",note:"Took tribute from Menahem, deported Galilee under Pekah, and was hired by Ahaz."});
+M("rezin","Rezin","aram",750,732,"2 Kgs 16:5–9; Isa 7:1–8",{note:"Allied with Pekah against Ahaz; killed by Tiglath-pileser when Damascus fell."});
+M("shalmaneser5","Shalmaneser V","assyria",727,722,"2 Kgs 17:3–6; 18:9",{note:"Besieged Samaria for three years."});
+M("sargon","Sargon II","assyria",722,705,"Isa 20:1",{note:"Claimed Samaria’s capture and deported its people."});
+M("sennacherib","Sennacherib","assyria",705,681,"2 Kgs 18:13–19:37; Isa 36–37",{note:"Invaded Judah in 701; “shut up Hezekiah like a bird in a cage,” by his own account, but never took Jerusalem."});
+M("esarhaddon","Esarhaddon","assyria",681,669,"2 Kgs 19:37; Ezra 4:2",{});
+M("ashurbanipal","Ashurbanipal","assyria",669,631,"",{note:"Assyria at its height; sacked Thebes in 663 (Nah 3:8)."});
+M("nabopolassar","Nabopolassar","babylon",626,605,"",{note:"Founded the Neo-Babylonian empire and, with the Medes, destroyed Nineveh in 612."});
+M("neco","Neco II","egypt",610,595,"2 Kgs 23:29–35; Jer 46:2",{note:"Killed Josiah at Megiddo; defeated by Babylon at Carchemish in 605."});
+M("nebuchadnezzar","Nebuchadnezzar II","babylon",605,562,"2 Kgs 24–25; Dan 1–4",{note:"Deported Judah in 605, 597, and 586/587, and destroyed the temple."});
+M("evilmerodach","Evil-merodach","babylon",562,560,"2 Kgs 25:27–30; Jer 52:31",{note:"Released Jehoiachin from prison."});
+M("nabonidus","Nabonidus & Belshazzar","babylon",556,539,"Dan 5",{note:"Nabonidus left his son Belshazzar ruling in Babylon, which explains why Belshazzar could only offer Daniel third place in the kingdom (Dan 5:16)."});
+M("cyrus","Cyrus","persia",539,530,"Ezra 1:1–4; Isa 44:28; 45:1",{note:"Named by Isaiah long before his birth; decreed the return of the exiles."});
+M("cambyses","Cambyses","persia",530,522,"",{});
+M("darius","Darius I","persia",522,486,"Ezra 4:24–6:15; Hag 1:1; Zech 1:1",{note:"The temple was finished in his sixth year (515)."});
+M("xerxes","Xerxes I","persia",486,465,"Esth 1:1; Ezra 4:6",{aka:"Ahasuerus",note:"Esther’s husband."});
+M("artaxerxes","Artaxerxes I","persia",465,424,"Ezra 7:1–7; Neh 2:1",{note:"Sent Ezra (458) and Nehemiah (445)."});
+
+/* Events */
+E("ev-jeru",1002,"David takes Jerusalem","2 Sam 5:6–10; 1 Chr 11:4–9","d");
+E("ev-temple",967,"Temple begun","1 Kgs 6:1; 2 Chr 3:1–2","sd",{note:"Solomon’s fourth year, “the 480th year” after the exodus, which places the exodus around 1446."});
+E("ev-split",931,"Kingdom divides","1 Kgs 12:16–20; 2 Chr 10","osd",{major:true});
+E("ev-shishak",926,"Shishak plunders Jerusalem","1 Kgs 14:25–26; 2 Chr 12:2–9","d");
+E("ev-qarqar",853,"Battle of Qarqar","","d",{note:"Ahab’s army fights Shalmaneser III. Known from Assyrian records, not Scripture, and one of the fixed dates behind this chronology."});
+E("ev-jehu",841,"Jehu’s revolt","2 Kgs 9–10","sd",{note:"Jehu kills both Joram of Israel and Ahaziah of Judah on the same day; Athaliah seizes Judah’s throne."});
+E("ev-samaria",723,"Samaria falls","2 Kgs 17:5–6; 18:9–12","osd",{major:true,aka:"Assyrian captivity",note:"After a three-year siege, Israel is carried into Assyrian exile. Often given as 722."});
+E("ev-701",701,"Sennacherib besieges Jerusalem","2 Kgs 18:13–19:37; Isa 36–37","sd",{note:"The angel of the LORD strikes the Assyrian camp (2 Kgs 19:35)."});
+E("ev-622",622,"Book of the Law found","2 Kgs 22:8–23:25; 2 Chr 34:14–33","sd");
+E("ev-612",612,"Nineveh falls","Nah 2–3; Zeph 2:13–15","d");
+E("ev-609",609,"Josiah killed at Megiddo","2 Kgs 23:29–30; 2 Chr 35:20–25","d");
+E("ev-605",605,"First deportation","Dan 1:1–6; Jer 25:1","sd",{note:"After the Battle of Carchemish, Babylon takes Daniel and other young nobles."});
+E("ev-597",597,"Second deportation","2 Kgs 24:10–16; Ezek 1:2","sd",{note:"Jehoiachin, Ezekiel, and 10,000 captives are taken to Babylon."});
+E("ev-587",587,"Jerusalem destroyed","2 Kgs 25:8–10; Jer 52:12–14; Lam 1","osd",{major:true,aka:"Babylonian captivity",note:"The temple is burned. Young dates this to 587 from Ezekiel, Jeremiah, and Kings; Thiele and many charts give 586."});
+E("ev-539",539,"Babylon falls to Cyrus","Dan 5:30–31","sd");
+E("ev-538",538,"Cyrus’s decree, first return","Ezra 1:1–4; 2 Chr 36:22–23","osd",{major:true});
+E("ev-536",536,"Temple foundation relaid","Ezra 3:8–13","d");
+E("ev-515",515,"Second temple completed","Ezra 6:15","sd");
+E("ev-458",458,"Ezra returns","Ezra 7:7–9","sd");
+E("ev-444",444,"Wall rebuilt","Neh 2:1; 6:15","sd",{note:"Nehemiah arrives in 445 and the wall is finished in 52 days."});
+E("ev-430",430,"Old Testament closes","Mal 4:4–6","osd",{note:"Malachi is the last prophet until John the Baptist, roughly four centuries later."});
+
+/* ---------- Creation to Revelation additions ---------- */
+const PRE = 9999, PREEND = MAXY + 1;  // undated items before Abraham sit in a not-to-scale zone
+function PR(group, id, name, start, end, role, o){ add(Object.assign({kind:"person", group, id, name, start, end, role}, o)); }
+function JD(id, name, start, end, role, refs, o){ add(Object.assign({kind:"ruler", group:"judea", id, name, start, end, role, refs}, o)); }
+function EMS(id, name, emp, start, end, refs, note){ add({kind:"empire", summary:true, group:"empires", id, name, emp, start, end, refs, note, views:"osd"}); }
+
+/* Before Abraham (undated, not to scale) */
+ERA("era-pre", "Before Abraham", PRE, PREEND, {pre:[0,1], note:"Genesis 1–11: creation, the fall, the flood, and Babel. Scripture gives genealogies with ages (Gen 5; 11), but whether they are complete is debated. Read straight through in the Hebrew text, they place creation near 4000 BC and the flood near 2350 BC (Ussher’s 4004 and 2348); the Greek Septuagint’s numbers run longer. This zone is drawn without a scale.", refs:"Gen 1–11; Luke 3:23–38"});
+E("ev-creation", PRE, "Creation", "Gen 1–2; Ps 33:6–9; John 1:1–3; Heb 11:3", "osd", {pre:[0.04], major:true, note:"God makes all things by His word in six days and rests on the seventh."});
+E("ev-fall", PRE, "The fall", "Gen 3; Rom 5:12–21", "sd", {pre:[0.16], note:"Adam’s sin brings death to all. Genesis 3:15 gives the first promise of a Redeemer, the seed of the woman."});
+E("ev-flood", PRE, "The flood", "Gen 6–9; Matt 24:37–39; 2 Pet 3:5–7", "osd", {pre:[0.56], major:true, note:"Judgment on a corrupt world; Noah and his family are saved in the ark. God’s covenant with Noah follows (Gen 9)."});
+E("ev-babel", PRE, "Tower of Babel", "Gen 11:1–9", "sd", {pre:[0.82], note:"God confuses the languages and scatters the nations (Gen 10–11), setting the stage for His call to Abraham."});
+PR("patriarchs","adam","Adam",PRE,PREEND,"First man",{pre:[0.03,0.40],views:"sd",years:"930 (Gen 5:5)",refs:"Gen 1:26–5:5; Rom 5:12–14; 1 Cor 15:22, 45",note:"Made in God’s image and placed in Eden. Paul presents him as a type of Christ, “the last Adam.”"});
+PR("patriarchs","noah","Noah",PRE,PREEND,"Patriarch",{pre:[0.42,0.74],views:"sd",years:"950 (Gen 9:29)",refs:"Gen 5:28–9:29; Heb 11:7; 2 Pet 2:5",note:"“A herald of righteousness” who built the ark by faith."});
+
+/* Patriarchs, Moses, judges */
+ERA("era-patriarchs", "Patriarchs", 2166, 1876, {note:"Abraham, Isaac, and Jacob live as sojourners in Canaan. Dates follow the early exodus (1446) and the 430 years in Egypt of Exodus 12:40.", refs:"Gen 12–50"});
+ERA("era-egypt", "Israel in Egypt", 1876, 1446, {note:"430 years in Egypt (Exod 12:40–41), ending in slavery and the exodus. Some, following the Septuagint and Gal 3:17, count the 430 years from Abraham instead, which would halve the stay in Egypt.", refs:"Gen 46–Exod 12; Gal 3:17"});
+ERA("era-wilderness", "Exodus & wilderness", 1446, 1406, {note:"The LORD redeems Israel from Egypt, gives the Law at Sinai, and disciplines a faithless generation for forty years.", refs:"Exod 12–Deut 34"});
+ERA("era-judges2", "Conquest & judges", 1406, 1051, {note:"Joshua leads the conquest; then “everyone did what was right in his own eyes” (Judg 21:25) through cycles of sin, oppression, and deliverance.", refs:"Josh 1–24; Judg 1–21; Ruth"});
+PR("patriarchs","abraham","Abraham",2166,1991,"Patriarch",{years:"175 (Gen 25:7)",refs:"Gen 11:26–25:11; Rom 4; Gal 3:6–9; Heb 11:8–19",note:"Called from Ur and Haran; entered Canaan at 75 (Gen 12:4). God’s promise that all nations would be blessed in him is “the gospel beforehand” (Gal 3:8)."});
+PR("patriarchs","isaac","Isaac",2066,1886,"Patriarch",{years:"180 (Gen 35:28)",refs:"Gen 21–28; 35:27–29; Heb 11:17–20",note:"Born when Abraham was 100 (Gen 21:5); offered on Mount Moriah and spared (Gen 22)."});
+PR("patriarchs","jacob","Jacob",2006,1859,"Patriarch",{aka:"Israel",years:"147 (Gen 47:28)",refs:"Gen 25:19–50:14",note:"Renamed Israel (Gen 32:28); father of the twelve tribes. Moved to Egypt at 130 (Gen 47:9)."});
+PR("patriarchs","joseph","Joseph",1915,1805,"Patriarch",{years:"110 (Gen 50:26)",refs:"Gen 37–50; Heb 11:22",note:"Sold into Egypt at 17 (Gen 37:2), raised to power at 30 (Gen 41:46). “You meant evil against me, but God meant it for good” (Gen 50:20)."});
+PR("patriarchs","job","Job",2100,1800,"Man of faith",{window:true,refs:"Job 1–42; Ezek 14:14; Jas 5:11",note:"Undated. His household priesthood, wealth in livestock, and long life point to the patriarchal era."});
+PR("patriarchs","moses","Moses",1526,1406,"Prophet and lawgiver",{years:"120 (Deut 34:7)",refs:"Exod 2–Deut 34; Acts 7:20–44; Heb 3:1–6; 11:23–29",note:"Eighty at the exodus (Exod 7:7). Mediator of the Sinai covenant, and the prophet whose greater successor God promised (Deut 18:15; Acts 3:22)."});
+PR("patriarchs","aaron","Aaron",1529,1407,"First high priest",{years:"123 (Num 33:39)",refs:"Exod 4:14–Num 20:29; Heb 5:1–5; 7:11",note:"Moses’ older brother and Israel’s first high priest; his priesthood foreshadows Christ’s greater priesthood (Heb 7)."});
+PR("patriarchs","joshua","Joshua",1485,1375,"Leader of the conquest",{window:true,years:"110 (Josh 24:29)",refs:"Exod 17:8–14; Num 13–14; Josh 1–24",note:"Exact birth and death years are unknown. “As for me and my house, we will serve the LORD” (Josh 24:15)."});
+const JNOTE = " The judges’ terms overlap in places (several judged different regions at once), so all their dates are approximate.";
+const JG = (id,name,s,e,role,o) => PR("oprophets",id,name,s,e,role,Object.assign({window:true,judge:true},o));
+JG("othniel","Othniel",1374,1334,"Judge",{years:"40 years of rest (Judg 3:11)",refs:"Judg 3:7–11",note:"Caleb’s nephew; delivered Israel from Cushan-rishathaim of Mesopotamia."+JNOTE});
+JG("ehud","Ehud",1316,1236,"Judge",{years:"80 years of rest (Judg 3:30)",refs:"Judg 3:12–30",note:"The left-handed Benjamite who killed Eglon of Moab."+JNOTE});
+JG("shamgar","Shamgar",1250,1230,"Judge",{years:"Not stated",refs:"Judg 3:31; 5:6",note:"Struck down 600 Philistines with an oxgoad."+JNOTE});
+JG("deborah","Deborah",1216,1176,"Prophetess and judge",{years:"40 years of rest (Judg 5:31)",refs:"Judg 4–5; Heb 11:32",note:"Judged Israel under her palm tree and called Barak to fight Sisera; her victory song is Judges 5."+JNOTE});
+JG("gideon","Gideon",1169,1129,"Judge",{years:"40 years of rest (Judg 8:28)",refs:"Judg 6–8; Heb 11:32",note:"Delivered Israel from Midian with 300 men. His son Abimelech then made himself king for three years (Judg 9)."+JNOTE});
+JG("tola","Tola",1126,1103,"Judge",{years:"23 (Judg 10:2)",refs:"Judg 10:1–2",note:"Of Issachar; judged after Abimelech."+JNOTE});
+JG("jair","Jair",1103,1081,"Judge",{years:"22 (Judg 10:3)",refs:"Judg 10:3–5",note:"A Gileadite with thirty sons who rode thirty donkeys."+JNOTE});
+JG("eli","Eli",1107,1067,"Priest and judge",{years:"40 (1 Sam 4:18)",refs:"1 Sam 1–4",note:"High priest at Shiloh who raised Samuel; died when the ark was captured."+JNOTE});
+JG("jephthah","Jephthah",1086,1080,"Judge",{years:"6 (Judg 12:7)",refs:"Judg 10:6–12:7; Heb 11:32",note:"Delivered Gilead from Ammon. Speaks of 300 years since Israel took the land (Judg 11:26), a key support for the early exodus date."+JNOTE});
+JG("ibzan","Ibzan",1080,1073,"Judge",{years:"7 (Judg 12:9)",refs:"Judg 12:8–10",note:"Of Bethlehem."+JNOTE});
+JG("samson","Samson",1075,1055,"Judge",{years:"20 (Judg 16:31)",refs:"Judg 13–16; Heb 11:32",note:"A Nazirite who began to deliver Israel from the Philistines (Judg 13:5); likely overlapped the eastern judges."+JNOTE});
+JG("elon","Elon",1073,1063,"Judge",{years:"10 (Judg 12:11)",refs:"Judg 12:11–12",note:"Of Zebulun."+JNOTE});
+JG("abdon","Abdon",1063,1055,"Judge",{years:"8 (Judg 12:14)",refs:"Judg 12:13–15",note:"Of Ephraim, with seventy sons and grandsons on donkeys."+JNOTE});
+
+/* Events, Abraham to the judges */
+E("ev-call",2091,"Abraham enters Canaan","Gen 12:1–7; Acts 7:2–4","osd",{major:true,note:"At 75, Abraham obeys God’s call. The covenant promises of land, offspring, and blessing begin here."});
+E("ev-sold",1898,"Joseph sold into Egypt","Gen 37:2, 25–28","d");
+E("ev-egypt",1876,"Jacob’s family moves to Egypt","Gen 46:1–7; 47:9; Exod 12:40","sd");
+E("ev-exodus",1446,"Exodus and the Law at Sinai","Exod 12–20; 1 Kgs 6:1","osd",{major:true,note:"480 years before the temple was begun (1 Kgs 6:1). Passover, the Red Sea, and the covenant at Sinai."});
+E("ev-canaan",1406,"Israel crosses the Jordan","Josh 3–6","osd",{major:true});
+
+/* Between the Testaments and the New Testament */
+ERA("era-between", "Between the Testaments", 430, 5, {aka:"The silent years", note:"No new prophet speaks for about four centuries, yet Daniel had foretold the age: Persia gives way to Greece, Greece divides, and a persecuting king defiles the temple (Dan 8; 11). Rome arrives in 63 BC. The Hebrew Scriptures are translated into Greek (the Septuagint), and synagogues spread through the world, preparing the way for the gospel (Gal 4:4).", refs:"Dan 8; 11:2–35; Gal 4:4"});
+ERA("era-christ", "Life of Christ", 5, -30, {note:"From Jesus’ birth before Herod’s death to His crucifixion, resurrection, and ascension. Many conservative scholars date the crucifixion to AD 33 rather than 30.", refs:"Matt; Mark; Luke; John"});
+ERA("era-church", "Apostolic church", -30, -100, {note:"From Pentecost through the ministries of the apostles and the writing of the New Testament, closing with John’s Revelation. The chart ends about AD 100.", refs:"Acts; Rev 1:9"});
+
+JD("judas-macc","Judas Maccabeus",166,160,"Leader of the Maccabean revolt","Dan 11:32–35; John 10:22",{note:"Led the revolt against Antiochus IV and rededicated the temple in 164, remembered at the Feast of Dedication, Hanukkah (John 10:22). His story is told in 1 Maccabees, a historical book outside the canon."});
+JD("hasmoneans","Hasmonean kingdom",142,63,"Independent Judea","",{note:"Judea’s priest-kings, from Simon (142) to the Roman conquest (63). Known from 1 Maccabees and Josephus, not from Scripture."});
+JD("hyrcanus","John Hyrcanus I",134,104,"Hasmonean ruler","",{views:"d",note:"Conquered Idumea and Samaria and destroyed the Samaritan temple on Mount Gerizim (compare John 4:20)."});
+JD("jannaeus","Alexander Jannaeus",103,76,"Hasmonean king","",{views:"d",note:"Priest and king whose harsh rule deepened the split between Pharisees and Sadducees."});
+JD("herod","Herod the Great",37,4,"King of Judea under Rome","Matt 2:1–22; Luke 1:5",{note:"An Idumean made king by Rome. Rebuilt the temple on a grand scale, begun 20/19 BC (John 2:20). Ordered the killing of Bethlehem’s boys. He died in 4 BC, so Jesus was born before then."});
+JD("archelaus","Archelaus",4,-6,"Ethnarch of Judea","Matt 2:22",{views:"d",note:"Herod’s son; Joseph avoided Judea because of him and settled in Nazareth. Deposed by Rome in AD 6, after which Judea was ruled by Roman governors."});
+JD("antipas","Herod Antipas",4,-39,"Tetrarch of Galilee","Luke 3:1; 13:31–32; 23:6–12; Mark 6:14–29",{note:"Ruled Galilee through Jesus’ ministry. Beheaded John the Baptist; Jesus called him “that fox.”"});
+JD("philip-t","Philip the tetrarch",4,-34,"Tetrarch of Iturea","Luke 3:1; Mark 8:27",{views:"d",note:"Built Caesarea Philippi, where Peter confessed Jesus as the Christ."});
+JD("caiaphas","Caiaphas",-18,-36,"High priest","Matt 26:57–68; John 11:49–53; 18:13–24",{views:"d"});
+JD("pilate","Pontius Pilate",-26,-36,"Roman governor of Judea","Luke 3:1; 23:1–25; John 18:28–19:22; 1 Tim 6:13",{note:"Sentenced Jesus to crucifixion. “Suffered under Pontius Pilate” fixes the gospel in real history."});
+JD("agrippa1","Herod Agrippa I",-41,-44,"King of Judea","Acts 12",{note:"Killed James and imprisoned Peter; struck down by an angel of the Lord in AD 44."});
+JD("agrippa2","Herod Agrippa II",-50,-93,"Client king","Acts 25:13–26:32",{views:"d",window:true,note:"Heard Paul’s defense: “In a short time would you persuade me to be a Christian?”"});
+JD("felix","Felix",-52,-59,"Roman governor","Acts 23:24–24:27",{views:"d",note:"Kept Paul in custody two years at Caesarea, hoping for a bribe."});
+JD("festus","Festus",-59,-62,"Roman governor","Acts 24:27–26:32",{views:"d",note:"Paul appealed to Caesar before him."});
+
+PR("nt","jesus","Jesus Christ",5,-30,"The Christ",{views:"osd",alt:[5,-33,"if crucified in AD 33"],refs:"Matt 1–28; Mark 1–16; Luke 1–24; John 1–21; Gal 4:4",note:"Born before Herod’s death (4 BC), probably 6–4 BC. About thirty at His baptism (Luke 3:23). Crucified and raised in AD 30 or 33; both dates have strong conservative defenders. He is the fulfillment this whole chart points to: the seed of the woman, Abraham’s offspring, the prophet like Moses, David’s greater Son, and the suffering Servant."});
+PR("nt","john-baptist","John the Baptist",6,-28,"Prophet and forerunner",{refs:"Luke 1:5–80; 3:1–20; Matt 3; 11:7–14; Mark 6:14–29",note:"Born about six months before Jesus. Began preaching in the fifteenth year of Tiberius (Luke 3:1). The last and greatest of the Old Testament-style prophets (Matt 11:11–13); beheaded by Herod Antipas."});
+PR("nt","peter","Peter",-27,-65,"Apostle",{window:true,refs:"Matt 16:13–19; John 21:15–19; Acts 1–12; 15:7–11; 1 Pet 1:1; 2 Pet 1:1",note:"Called at the start of Jesus’ ministry; preached at Pentecost. Early tradition places his martyrdom in Rome under Nero, c. AD 64–67."});
+PR("nt","james-z","James son of Zebedee",-27,-44,"Apostle",{views:"d",refs:"Mark 1:19; 3:17; Acts 12:1–2",note:"First of the Twelve to be martyred, killed by Herod Agrippa I."});
+PR("nt","james-b","James the Lord’s brother",-30,-62,"Leader in Jerusalem",{views:"d",window:true,refs:"1 Cor 15:7; Gal 1:19; 2:9; Acts 15:13–21; Jas 1:1",note:"Came to faith after seeing the risen Christ; led the Jerusalem church and wrote the letter of James. Stoned in AD 62, according to Josephus."});
+PR("nt","paul","Paul",-33,-65,"Apostle to the Gentiles",{views:"osd",window:true,refs:"Acts 9; 13–28; Gal 1:11–2:14; Phil 3:4–6; 2 Tim 4:6–8",note:"Converted on the Damascus road c. AD 33/34. Wrote thirteen New Testament letters. Martyred in Rome c. AD 64–67."});
+PR("nt","paul-1","Paul’s 1st journey",-46,-48,"Missionary journey",{views:"d",refs:"Acts 13–14",note:"Cyprus and Galatia, with Barnabas."});
+PR("nt","paul-2","Paul’s 2nd journey",-49,-51,"Missionary journey",{views:"d",refs:"Acts 15:36–18:22",note:"Philippi, Thessalonica, Athens, and 18 months in Corinth, with Silas."});
+PR("nt","paul-3","Paul’s 3rd journey",-52,-57,"Missionary journey",{views:"d",refs:"Acts 18:23–21:17",note:"About three years in Ephesus."});
+PR("nt","paul-c","Paul imprisoned at Caesarea",-57,-59,"Imprisonment",{views:"d",refs:"Acts 23–26"});
+PR("nt","paul-r","Paul under arrest in Rome",-60,-62,"Imprisonment",{views:"d",refs:"Acts 28:16–31; Phil 1:12–14",note:"Two years in his own rented house; the likely setting of Ephesians, Philippians, Colossians, and Philemon."});
+PR("nt","john-ap","John the apostle",-27,-98,"Apostle",{window:true,refs:"John 21:20–24; Acts 3–4; Gal 2:9; Rev 1:1–9",note:"The beloved disciple. Exiled to Patmos (Rev 1:9); tradition places his death in Ephesus around AD 98."});
+
+E("ev-alexander",331,"Alexander conquers Persia","Dan 8:5–8, 21","osd",{note:"The goat from the west breaks the ram’s two horns, as Daniel saw (Dan 8:20–21)."});
+E("ev-lxx",250,"Septuagint translated","","d",{note:"The Hebrew Scriptures translated into Greek in Alexandria, beginning with the Law. Often quoted in the New Testament."});
+E("ev-antiochus",167,"Antiochus defiles the temple","Dan 8:9–14; 11:31","sd",{note:"Antiochus IV Epiphanes sets up pagan worship in the temple, the “abomination that makes desolate” (Dan 11:31)."});
+E("ev-hanukkah",164,"Temple rededicated","John 10:22","sd",{note:"The Maccabees cleanse the temple, the origin of the Feast of Dedication (Hanukkah)."});
+E("ev-pompey",63,"Rome takes Jerusalem","","osd",{note:"Pompey captures Jerusalem and Judea comes under Roman rule."});
+E("ev-herodtemple",20,"Herod begins rebuilding the temple","John 2:20","d");
+E("ev-birth",5,"Jesus born","Matt 1:18–2:12; Luke 2:1–20","osd",{major:true,note:"Born in Bethlehem before Herod’s death in 4 BC, probably 6–4 BC. (The BC/AD system, created in the 500s, missed by a few years.)"});
+E("ev-baptism",-27,"Jesus’ baptism","Matt 3:13–17; Luke 3:21–23","sd",{note:"About age thirty (Luke 3:23). Those who date the crucifixion to AD 33 place this around AD 29."});
+E("ev-cross",-30,"Crucifixion and resurrection","Matt 26–28; John 18–21; 1 Cor 15:3–8","osd",{major:true,note:"AD 30 or 33. Followed forty days later by the ascension (Acts 1:3, 9) and ten days after that by Pentecost (Acts 2)."});
+E("ev-stephen",-33,"Stephen martyred, Saul converted","Acts 7–9","sd");
+E("ev-council",-49,"Jerusalem Council","Acts 15; Gal 2:1–10","sd",{note:"Gentiles are saved by grace through faith without circumcision (Acts 15:11)."});
+E("ev-fire",-64,"Fire of Rome, Nero’s persecution","","d");
+E("ev-ad70",-70,"Rome destroys the temple","Matt 24:1–2; Luke 19:41–44; 21:20–24","osd",{major:true,note:"Titus’s army takes Jerusalem, as Jesus foretold. The sacrificial system ends."});
+E("ev-patmos",-95,"John on Patmos","Rev 1:9","sd",{note:"Usually dated to Domitian’s reign, c. AD 95; some argue for the late 60s."});
+
+/* World powers: whole empires (all views) */
+EMS("emp-egypt-mk","Egypt’s Middle Kingdom","egypt",2055,1650,"Gen 12:10–20; 41:41–57","Egypt as Abraham and Joseph knew it. Egyptian dates have a margin of error of a few decades.");
+EMS("emp-egypt-nk","Egypt’s New Kingdom","egypt",1550,1070,"Exod 1–14","Egypt of the oppression and the exodus, on the 1446 date.");
+EMS("emp-assyria","Assyrian empire","assyria",911,609,"2 Kgs 15–19; Isa 10:5–19; Jonah 3; Nah 1–3","Took Israel into exile in 723/722 and besieged Jerusalem in 701. Nineveh fell in 612; the last Assyrian stand failed at Harran in 609.");
+EMS("emp-babylon","Babylonian empire","babylon",626,539,"2 Kgs 24–25; Dan 1–5; Jer 25:8–14","Destroyed Jerusalem. The head of gold in Nebuchadnezzar’s dream (Dan 2:38).");
+EMS("emp-persia","Persian empire","persia",539,331,"Ezra 1:1–4; Esth 1:1; Dan 2:39; 8:20","Sent the exiles home. The silver chest and arms of Daniel 2 and the ram of Daniel 8.");
+EMS("emp-greece","Greek empire and successors","greece",331,63,"Dan 2:39; 7:6; 8:5–8, 21–22; 11:2–35","Alexander conquers Persia (331) and dies (323); his kingdom splits four ways (Dan 8:22). Judea passes from the Ptolemies of Egypt to the Seleucids of Syria in 198, then wins independence under the Hasmoneans in 142.");
+EMS("emp-rome","Roman empire","rome",63,-100,"Dan 2:40; Luke 2:1; John 19:12–15","Pompey takes Jerusalem in 63 BC; Augustus becomes emperor in 27 BC. Commonly identified with the iron kingdom of Daniel 2. Rome continues past the chart’s end.");
+M("thutmose3","Thutmose III","egypt",1479,1425,"Exod 2:15, 23",{note:"On the 1446 exodus date, likely the pharaoh from whom Moses fled and who died before Moses returned (Exod 2:23)."});
+M("amenhotep2","Amenhotep II","egypt",1427,1401,"Exod 5–14",{note:"On the 1446 date, likely the pharaoh of the exodus. Egyptian dates vary by a few years."});
+M("alexander","Alexander the Great","greece",336,323,"Dan 8:5–8, 21",{note:"Conquered from Greece to India in about a decade, then died at 32."});
+M("ptolemies","Ptolemies rule Judea","greece",301,198,"Dan 11:5–15",{note:"“The king of the south” in Daniel 11."});
+M("seleucids","Seleucids rule Judea","greece",198,142,"Dan 11:15–35",{note:"“The king of the north” in Daniel 11."});
+M("antiochus4","Antiochus IV Epiphanes","greece",175,164,"Dan 8:9–14, 23–25; 11:21–35",{note:"Outlawed the Law and defiled the temple; a forerunner of the final antichrist in many readings of Daniel."});
+M("augustus","Augustus","rome",27,-14,"Luke 2:1",{note:"His census brought Joseph and Mary to Bethlehem."});
+M("tiberius","Tiberius","rome",-14,-37,"Luke 3:1; 20:22–25",{note:"Emperor through Jesus’ ministry; the “Caesar” of the tribute question."});
+M("caligula","Caligula","rome",-37,-41,"",{});
+M("claudius","Claudius","rome",-41,-54,"Acts 11:28; 18:2",{note:"Expelled the Jews from Rome, bringing Aquila and Priscilla to Corinth."});
+M("nero","Nero","rome",-54,-68,"Acts 25:11; Phil 4:22",{note:"The Caesar Paul appealed to; persecuted Christians after the fire of AD 64."});
+M("vespasian","Vespasian","rome",-69,-79,"",{note:"Began the Jewish war as general and finished it as emperor."});
+M("titus","Titus","rome",-79,-81,"Luke 21:20",{note:"As general, destroyed Jerusalem in AD 70."});
+M("domitian","Domitian","rome",-81,-96,"Rev 1:9",{note:"John’s exile to Patmos is usually placed in his reign."});
+
+/* Books: Law, early history, poetry, New Testament */
+B("b-gen","Genesis",PRE,1805,"law","osd",{pre:[0,null],refs:"Gen 1–50",note:"Creation to Joseph’s death."});
+B("b-exod","Exodus",1526,1445,"law","osd",{refs:"Exod 1–40",note:"Opens after Joseph’s death, then runs from Moses’ birth to the tabernacle (1445)."});
+B("b-lev","Leviticus",1445,1445,"law","sd",{refs:"Lev 1–27",note:"Laws given at Sinai within about a month (Exod 40:17; Num 1:1)."});
+B("b-num","Numbers",1445,1406,"law","osd",{refs:"Num 1–36",note:"From Sinai through the forty years to the plains of Moab."});
+B("b-deut","Deuteronomy",1406,1406,"law","osd",{refs:"Deut 1–34",note:"Moses’ farewell sermons on the plains of Moab."});
+B("b-josh","Joshua",1406,1375,"history","osd",{window:true,refs:"Josh 1–24",note:"The conquest and division of the land."});
+B("b-judg","Judges",1375,1051,"history","osd",{window:true,refs:"Judg 1–21",note:"Approximate; many episodes overlap."});
+B("b-ruth","Ruth",1150,1100,"history","sd",{window:true,refs:"Ruth 1–4",note:"Set “in the days when the judges ruled”; Ruth was David’s great-grandmother (Ruth 4:17)."});
+B("b-job","Job",2100,1800,"poetry","sd",{window:true,refs:"Job 1–42",note:"Undated; the setting suggests the patriarchal era."});
+const NTB = (id,name,s,e,cat,views,refs,note,o) => B(id,name,s,e,cat,views,Object.assign({refs,note,nt:true},o||{}));
+NTB("b-matt","Matthew",5,-30,"gospel","osd","Matt 1–28","Spans the events it records, c. 5 BC–AD 30. Likely written in the 50s or 60s.");
+NTB("b-mark","Mark",-27,-30,"gospel","osd","Mark 1–16","Begins with John the Baptist. Likely written in the mid-50s to 60s, from Peter’s preaching (by early tradition).");
+NTB("b-luke","Luke",6,-30,"gospel","osd","Luke 1–24","Begins with John the Baptist’s birth. Written c. AD 60–62, before Acts.");
+NTB("b-john","John",-27,-30,"gospel","osd","John 1–21","Ministry focused, with three Passovers. Written c. AD 80s–90s.");
+NTB("b-acts","Acts",-30,-62,"nt-history","osd","Acts 1–28","From the ascension to Paul under house arrest in Rome, c. AD 62.");
+const L2 = [["b-jas","James",-45,-49,"Jas 1–5","Possibly the earliest New Testament book."],["b-gal","Galatians",-48,-49,"Gal 1–6","Before or just after the Jerusalem Council."],["b-1th","1 Thessalonians",-50,-51,"1 Thess 1–5","From Corinth on the second journey."],["b-2th","2 Thessalonians",-50,-51,"2 Thess 1–3","Months after 1 Thessalonians."],["b-1cor","1 Corinthians",-54,-55,"1 Cor 1–16","From Ephesus."],["b-2cor","2 Corinthians",-55,-56,"2 Cor 1–13","From Macedonia."],["b-rom","Romans",-56,-57,"Rom 1–16","From Corinth, before Paul took the collection to Jerusalem."],["b-eph","Ephesians",-60,-62,"Eph 1–6","A prison letter, likely from Rome."],["b-phil","Philippians",-60,-62,"Phil 1–4","A prison letter, likely from Rome."],["b-col","Colossians",-60,-62,"Col 1–4","A prison letter, likely from Rome."],["b-phlm","Philemon",-60,-62,"Phlm 1–25","Sent with Colossians."],["b-1tim","1 Timothy",-62,-64,"1 Tim 1–6","After Paul’s release from his first Roman imprisonment."],["b-titus","Titus",-62,-64,"Titus 1–3","Same period as 1 Timothy."],["b-1pet","1 Peter",-62,-64,"1 Pet 1–5","From “Babylon,” likely Rome."],["b-heb","Hebrews",-60,-69,"Heb 1–13","Before AD 70; the temple service is still running (Heb 10:1–3)."],["b-2tim","2 Timothy",-64,-67,"2 Tim 1–4","Paul’s last letter, awaiting death."],["b-2pet","2 Peter",-64,-67,"2 Pet 1–3","Shortly before Peter’s death (2 Pet 1:14)."],["b-jude","Jude",-65,-80,"Jude 1–25","By the brother of James; date uncertain."],["b-1jn","1 John",-85,-95,"1 John 1–5","Likely from Ephesus."],["b-2jn","2 John",-85,-95,"2 John 1–13","Likely from Ephesus."],["b-3jn","3 John",-85,-95,"3 John 1–15","Likely from Ephesus."]];
+L2.forEach(b => NTB(b[0],b[1],b[2],b[3],"letter","sd",b[4],"Shown at its likely date of writing. "+b[5],{window:true}));
+NTB("b-rev","Revelation",-95,-96,"apocalyptic","sd","Rev 1–22","Shown at its likely date of writing, under Domitian. Some date it to the late 60s under Nero.",{window:true,alt:[-68,-69,"early date under Nero"]});
+
+
+/* ---------- Books of the Bible parsing ---------- */
+const ABBR = {"Gen":"Genesis","Exod":"Exodus","Lev":"Leviticus","Num":"Numbers","Deut":"Deuteronomy","Josh":"Joshua","Judg":"Judges","Ruth":"Ruth","1 Sam":"1 Samuel","2 Sam":"2 Samuel","1 Kgs":"1 Kings","2 Kgs":"2 Kings","1 Chr":"1 Chronicles","2 Chr":"2 Chronicles","Ezra":"Ezra","Neh":"Nehemiah","Esth":"Esther","Job":"Job","Ps":"Psalms","Prov":"Proverbs","Eccl":"Ecclesiastes","Song":"Song of Songs","Isa":"Isaiah","Jer":"Jeremiah","Lam":"Lamentations","Ezek":"Ezekiel","Dan":"Daniel","Hos":"Hosea","Joel":"Joel","Amos":"Amos","Obad":"Obadiah","Jonah":"Jonah","Mic":"Micah","Nah":"Nahum","Hab":"Habakkuk","Zeph":"Zephaniah","Hag":"Haggai","Zech":"Zechariah","Mal":"Malachi","Matt":"Matthew","Mark":"Mark","Luke":"Luke","John":"John","Acts":"Acts","Rom":"Romans","1 Cor":"1 Corinthians","2 Cor":"2 Corinthians","Gal":"Galatians","Eph":"Ephesians","Phil":"Philippians","Col":"Colossians","1 Thess":"1 Thessalonians","2 Thess":"2 Thessalonians","1 Tim":"1 Timothy","2 Tim":"2 Timothy","Titus":"Titus","Phlm":"Philemon","Heb":"Hebrews","Jas":"James","1 Pet":"1 Peter","2 Pet":"2 Peter","1 John":"1 John","2 John":"2 John","3 John":"3 John","Jude":"Jude","Rev":"Revelation"};
+const OT_ORDER = ["Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth","1 Samuel","2 Samuel","1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra","Nehemiah","Esther","Job","Psalms","Proverbs","Ecclesiastes","Song of Songs","Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos","Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah","Malachi","Matthew","Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James","1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"];
+function parseBooks(refs){
+  const out = new Set(); if(!refs) return out;
+  const re = /((?:[123] )?[A-Z][a-z]+) \d/g; let m;
+  while((m = re.exec(refs))) if(ABBR[m[1]]) out.add(ABBR[m[1]]);
+  return out;
+}
+D.forEach(it => {
+  it.books = parseBooks((it.refs||"") + "; " + (it.verdictRef||""));
+  if(it.book) it.books.add(it.book);
+  (it.extraBooks||[]).forEach(b => it.books.add(b));
+});
+function refLinks(refs){
+  if(!refs) return "";
+  let last = "";
+  return refs.split(";").map(seg => {
+    seg = seg.trim(); if(!seg) return "";
+    const m = seg.match(/^((?:[123] )?[A-Z][a-z]+)\s+(.*)$/);
+    let full;
+    if(m && ABBR[m[1]]){ last = ABBR[m[1]]; full = last + " " + m[2]; }
+    else if(last){ full = last + " " + seg; }
+    else return `<li>${esc(seg)}</li>`;
+    full = full.replace(/([123] [A-Z][a-z]+)/g, x => ABBR[x] || x).replace(/–/g, "-");
+    const url = "https://www.biblegateway.com/passage/?search=" + encodeURIComponent(full) + "&version=ESV";
+    return `<li><a href="${url}" target="_blank" rel="noopener">${esc(seg)}</a></li>`;
+  }).join("");
+}
+
+/* ---------- Groups, colors ---------- */
+const GROUPS = [
+  {id:"era", title:"Eras", short:"Eras", pack:true},
+  {id:"events", title:"Key events", short:"Events", pack:true},
+  {id:"patriarchs", title:"Patriarchs & Moses", short:"Patriarchs"},
+  {id:"united", title:"United kingdom", short:"United"},
+  {id:"judah", title:"Judah (south)", short:"Judah"},
+  {id:"israel", title:"Israel (north)", short:"Israel"},
+  {id:"prophets", title:"Writing prophets", short:"Prophets"},
+  {id:"oprophets", title:"Judges & other prophets", short:"Judges & prophets"},
+  {id:"leaders", title:"Exile & return leaders", short:"Leaders"},
+  {id:"judea", title:"Judea’s rulers", short:"Judea"},
+  {id:"nt", title:"Jesus & the apostles", short:"Jesus"},
+  {id:"books", title:"Bible books", short:"Books"},
+  {id:"empires", title:"World powers", short:"Powers"}
+];
+const GTITLE = Object.fromEntries(GROUPS.map(g => [g.id, g.title]));
+const GMAP = Object.fromEntries(GROUPS.map(g => [g.id, g]));
+const GCOLOR = {era:"var(--era)", events:"var(--ink)", patriarchs:"var(--patriarch)", united:"var(--united)", judah:"var(--judah)", israel:"var(--israel)", prophets:"var(--prophet)", oprophets:"var(--oprophet)", leaders:"var(--leader)", judea:"var(--judea)", nt:"var(--christ)", books:"var(--book)", empires:"var(--rome)"};
+const DONLY = {leaders:true};
+const DYN_PAL = ["#7A6A1F","#2D5E8A","#A87412","#8A2E44","#2E7D4F","#5A3F92","#21797B","#B23A31","#69703A","#B2647E","#56616C","#7C4A2A","#C08417"];
+const dynMap = {};
+D.filter(i => i.kind === "king").forEach(i => { if(!(i.dynasty in dynMap)) dynMap[i.dynasty] = DYN_PAL[Object.keys(dynMap).length % DYN_PAL.length]; });
+const EMP = {assyria:"Assyria", babylon:"Babylon", persia:"Persia", egypt:"Egypt", aram:"Aram (Syria)", greece:"Greece", rome:"Rome"};
+const AUD = {israel:"to Israel (north)", judah:"to Judah", nations:"to the nations", exile:"to the exiles", return:"to the returned exiles", all:"to all Israel"};
+const VERDICT = {right:"Did right", mixed:"Mixed", evil:"Did evil", none:"No verdict given"};
+
+function colorOf(it){
+  if(it.kind === "king"){
+    if(S.colorBy === "verdict") return `var(--${it.verdict})`;
+    if(S.colorBy === "dynasty") return dynMap[it.dynasty];
+  }
+  if(it.kind === "empire") return `var(--${it.emp})`;
+  if(it.kind === "book" && it.nt) return "var(--ntbook)";
+  return ({united:"var(--united)", judah:"var(--judah)", israel:"var(--israel)", prophets:"var(--prophet)", oprophets:"var(--oprophet)", books:"var(--book)", leaders:"var(--leader)", era:"var(--era)", events:"var(--ink)", patriarchs:"var(--patriarch)", judea:"var(--judea)", nt:"var(--christ)"})[it.group];
+}
+
+/* ---------- State ---------- */
+const S = {
+  view:"s", layout: window.innerWidth >= 900 ? "rows" : "compact", colorBy:"kingdom", ppy:2,
+  show:{}, order:[], verdict:{right:true, mixed:true, evil:true},
+  aud:{israel:true, judah:true, nations:true, exile:true},
+  alt:false, book:"", q:"", sel:null, pin:null
+};
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]); }
+function fy(y){ return y > 0 ? `${y} BC` : `AD ${-y}`; }
+function yb(y){ return y > 0 ? String(y) : `AD ${-y}`; }
+function range(s, e){
+  if(s >= PREEND) return e >= PREEND ? "Undated" : `Creation to ${fy(e)}`;
+  if(s === e) return fy(s);
+  if(s > 0 && e > 0) return `${s}–${e} BC`;
+  if(s <= 0 && e <= 0) return `AD ${-s}–${-e}`;
+  return `${s} BC–AD ${-e}`;
+}
+function shortRange(s, e){
+  if(s >= PREEND) return e >= PREEND ? "undated" : `–${yb(e)}`;
+  if(s === e) return yb(s);
+  if(s <= 0 && e <= 0) return `AD ${-s}–${-e}`;
+  if(s > 0 && e <= 0) return `${s} BC–AD ${-e}`;
+  return `${yb(s)}–${yb(e)}`;
+}
+function X(y){ return PRE_W + (MAXY - y) * S.ppy; }
+function dispStart(it){ return (S.view === "d" && it.coStart) ? it.coStart : it.start; }
+function fullStart(it){ return it.coStart || it.start; }
+
+function visible(it){
+  if(!it.views.includes(S.view)) return false;
+  const g = it.group;
+  if(S.show[g] === false) return false;
+  if(it.kind === "king" && it.verdict !== "none" && !S.verdict[it.verdict]) return false;
+  if(it.kind === "prophet"){
+    const a = it.aud;
+    if(a === "all"){ if(!S.aud.israel && !S.aud.judah) return false; }
+    else if(!S.aud[a === "return" ? "exile" : a]) return false;
+  }
+  return true;
+}
+function hit(it){
+  if(S.q){
+    const s = [it.name, it.aka, it.note, it.refs, it.dynasty].filter(Boolean).join(" ").toLowerCase();
+    if(!s.includes(S.q)) return false;
+  }
+  return true;
+}
+const dimmed = it => S.q && !hit(it);
+function inFocus(it){ return !S.book || it.kind === "era" || it.books.has(S.book); }
+
+/* ---------- Measure ---------- */
+const mctx = document.createElement("canvas").getContext("2d");
+const twCache = {};
+function tw(s){
+  if(twCache[s] != null) return twCache[s];
+  mctx.font = `600 13px ${UIFONT}`;
+  return (twCache[s] = Math.ceil(mctx.measureText(s).width));
+}
+function labelWidth(){
+  const narrow = window.innerWidth < 600;
+  return S.layout === "rows" ? (narrow ? 122 : 158) : (narrow ? 80 : 114);
+}
+function fitPPY(){
+  const chart = document.getElementById("chart");
+  return Math.max(0.25, (chart.clientWidth - labelWidth() - PRE_W - 40) / SPAN);
+}
+function defaultPPY(){
+  const f = fitPPY();
+  if(S.view === "o") return f;
+  if(S.view === "s") return Math.max(f, 2);
+  return Math.max(f, 3);
+}
+
+/* ---------- Render ---------- */
+const chart = document.getElementById("chart");
+const canvas = document.getElementById("canvas");
+
+function entryFor(it, ghost){
+  const ppy = S.ppy;
+  const s = ghost ? it.alt[0] : dispStart(it);
+  const e = ghost ? it.alt[1] : it.end;
+  const label = ghost ? `${it.name} (alt.)` : (it.kind === "event" ? (it.pre ? it.name : `${yb(it.start)} ${it.name}`) : it.name);
+  const x = (!ghost && it.pre) ? it.pre[0] * PRE_W : X(s);
+  if(it.kind === "event"){
+    return {it, ghost:false, x, w:0, label, px:x - 6, reserve:16 + tw(label) + 10};
+  }
+  const x1 = (!ghost && it.pre && it.pre[1] != null) ? it.pre[1] * PRE_W : X(e);
+  const w = Math.max(x1 - x, 6);
+  const lw = tw(label) + 12;
+  const inside = lw <= w;
+  if(it.kind === "era") return {it, ghost, x, w, label: inside ? label : "", inside:true, px:x, reserve:w};
+  return {it, ghost, x, w, label, inside, px:x, reserve: inside ? w : w + 6 + lw};
+}
+function pack(ens){
+  const ends = [];
+  ens.sort((a, b) => a.px - b.px);
+  for(const e of ens){
+    let r = ends.findIndex(v => v <= e.px + 0.5);
+    if(r < 0){ r = ends.length; ends.push(-1e9); }
+    ends[r] = e.px + e.reserve; e.row = r;
+  }
+  return ends.length;
+}
+function barHTML(en){
+  const it = en.it, c = colorOf(it);
+  if(it.kind === "event"){
+    const cls = ["ev"]; if(!it.major) cls.push("minor"); if(dimmed(it)) cls.push("dim"); if(S.sel === it.id) cls.push("sel");
+    return `<button class="${cls.join(" ")}" data-id="${it.id}" style="left:${(en.x - 6).toFixed(1)}px" title="${esc((it.pre ? "" : fy(it.start) + ": ") + it.name)}">${esc(en.label)}</button>`;
+  }
+  const cls = ["bar"];
+  if(it.kind === "era") cls.push("era");
+  if(it.window && !en.ghost) cls.push("window");
+  if(en.ghost) cls.push("ghost");
+  if(S.sel === it.id && !en.ghost) cls.push("sel");
+  if(dimmed(it)) cls.push("dim");
+  let co = "";
+  if(!en.ghost && S.view === "d" && it.coStart){
+    co = `<span class="co" style="width:${((it.coStart - it.start) * S.ppy).toFixed(1)}px"></span>`;
+  }
+  const s = en.ghost ? it.alt[0] : dispStart(it), e = en.ghost ? it.alt[1] : it.end;
+  const tip = `${it.name}: ${range(s, e)}${en.ghost ? " (alternate view)" : ""}`;
+  return `<button class="${cls.join(" ")}" data-id="${it.id}" style="left:${en.x.toFixed(1)}px;width:${en.w.toFixed(1)}px;--c:${c}" title="${esc(tip)}">${co}<span class="t ${en.inside ? "in" : "out"}">${esc(en.label)}</span></button>`;
+}
+
+function render(){
+  const ppy = S.ppy, W = PRE_W + Math.ceil(SPAN * ppy) + 200;
+  const lw = labelWidth();
+  document.documentElement.style.setProperty("--lw", lw + "px");
+  const vis = D.filter(i => visible(i) && inFocus(i));
+  let rows = "";
+
+  // axis
+  let labStep, minor;
+  if(ppy >= 10){ labStep = 10; minor = 5; }
+  else if(ppy >= 6){ labStep = 25; minor = 5; }
+  else if(ppy >= 3.2){ labStep = 50; minor = 10; }
+  else if(ppy >= 1.5){ labStep = 50; minor = 25; }
+  else if(ppy >= 0.75){ labStep = 100; minor = 50; }
+  else { labStep = 200; minor = 100; }
+  let ticks = `<div class="tick pre" style="left:0">Not to scale</div>`, grid = `<div class="prezone" style="width:${PRE_W}px"></div>`;
+  for(let y = MAXY; y >= MINY; y -= minor){
+    const x = X(y).toFixed(1);
+    if(y % labStep === 0){
+      ticks += `<div class="tick" style="left:${x}px">${y === 0 ? "BC | AD" : yb(y)}</div>`;
+      grid += `<div class="gl" style="left:${x}px"></div>`;
+    } else ticks += `<div class="tick minor" style="left:${x}px"></div>`;
+  }
+  rows += `<div class="row axis"><div class="lab">Years</div><div class="track" style="width:${W}px">${ticks}<div class="htag" id="hoverTag"></div><div class="htag" id="pinTag"></div></div></div>`;
+
+  for(const g of S.order.map(id => GMAP[id])){
+    const items = vis.filter(i => i.group === g.id);
+    if(!items.length) continue;
+    const ens = [];
+    for(const it of items){
+      ens.push(entryFor(it, false));
+      if(S.alt && it.alt) ens.push(entryFor(it, true));
+    }
+    const packed = g.pack || S.layout === "compact";
+    if(packed){
+      const n = pack(ens);
+      for(let r = 0; r < n; r++){
+        const inRow = ens.filter(e => e.row === r).map(barHTML).join("");
+        rows += `<div class="row${r === 0 ? " gfirst" : ""}"><div class="lab">${r === 0 ? esc(S.layout === "compact" ? g.short : g.title) : ""}</div><div class="track" style="width:${W}px">${inRow}</div></div>`;
+      }
+    } else {
+      rows += `<div class="row gh"><div class="lab">${esc(g.title)}</div><div class="track" style="width:${W}px"></div></div>`;
+      const main = ens.filter(e => !e.ghost).sort((a, b) => a.x - b.x || D.indexOf(a.it) - D.indexOf(b.it));
+      for(const en of main){
+        const it = en.it;
+        const ghost = ens.find(e => e.ghost && e.it === it);
+        const s = dispStart(it);
+        rows += `<div class="row"><div class="lab click" data-id="${it.id}"><span class="ln">${esc(it.kind === "summary" ? "Whole kingdom" : it.name)}</span><span class="ld">${shortRange(s, it.end)}</span></div><div class="track" style="width:${W}px">${barHTML(en)}${ghost ? barHTML(ghost) : ""}</div></div>`;
+      }
+    }
+  }
+
+  // overlay: grid + event lines + hover + pin
+  let lines = "";
+  if(S.show.events) vis.filter(i => i.kind === "event").forEach(ev => {
+    lines += `<div class="evl${ev.major ? " major" : ""}" style="left:${(ev.pre ? ev.pre[0] * PRE_W : X(ev.start)).toFixed(1)}px"></div>`;
+  });
+  rows += `<div class="overlay" style="left:${lw}px;width:${W}px">${grid}${lines}<div id="hover"></div><div id="pin"></div></div>`;
+
+  canvas.style.width = (lw + W) + "px";
+  canvas.innerHTML = rows;
+  placePin();
+  renderLegend();
+}
+
+function placePin(){
+  const pin = document.getElementById("pin"), tag = document.getElementById("pinTag");
+  if(!pin) return;
+  if(S.pin == null){ pin.style.display = "none"; tag.style.display = "none"; return; }
+  const x = S.pin >= PREEND ? PRE_W / 2 : X(S.pin);
+  pin.style.display = "block"; pin.style.left = x + "px";
+  tag.style.display = "block"; tag.style.left = x + "px"; tag.textContent = S.pin >= PREEND ? "Before Abraham" : fy(S.pin);
+}
+
+/* ---------- Legend ---------- */
+function sw(c, cls, label){ return `<span><i class="sw ${cls || ""}" style="--c:${c}"></i>${esc(label)}</span>`; }
+function colorKey(){
+  if(S.colorBy === "verdict") return sw("var(--right)", "", "Did right") + sw("var(--mixed)", "", "Mixed") + sw("var(--evil)", "", "Did evil") + sw("var(--none)", "", "No verdict given");
+  if(S.colorBy === "dynasty"){
+    const seen = [...new Set(D.filter(i => i.kind === "king" && visible(i)).map(i => i.dynasty))];
+    return seen.map(dn => sw(dynMap[dn], "", dn === "David" ? "House of David" : dn === "Omri" ? "Omri (incl. Athaliah)" : dn)).join("");
+  }
+  return sw("var(--judah)", "", "Judah") + sw("var(--israel)", "", "Israel") + sw("var(--united)", "", "United kingdom");
+}
+function renderLegend(){
+  const lead = S.colorBy === "verdict" ? "Kings:" : S.colorBy === "dynasty" ? "Dynasties:" : "Kingdoms:";
+  document.getElementById("legend").innerHTML = `<span class="lead">${lead}</span>` + colorKey() + `<button class="chip" id="legendBtn" aria-expanded="${!legendPop.hidden}" aria-controls="legendPop">Full legend</button>`;
+  const fb = document.getElementById("focusbar");
+  if(S.book){
+    const n = D.filter(i => visible(i) && inFocus(i) && i.kind !== "era").length;
+    fb.hidden = false;
+    fb.innerHTML = `<span>Focused on <b>${esc(S.book)}</b>: showing the ${n} items it covers.</span><button class="btn" id="clearFocus">Clear focus</button>`;
+  } else fb.hidden = true;
+  if(!legendPop.hidden) renderLegendPop();
+}
+function renderLegendPop(){
+  const d = S.view === "d";
+  let lanes = "";
+  if(S.view !== "o") lanes += sw("var(--patriarch)", "", "Patriarchs & Moses");
+  lanes += sw("var(--prophet)", "", "Writing prophets");
+  if(d) lanes += sw("var(--oprophet)", "", "Judges & other prophets") + sw("var(--leader)", "", "Exile & return leaders");
+  if(S.view !== "o") lanes += sw("var(--judea)", "", "Judea’s rulers");
+  lanes += sw("var(--christ)", "", "Jesus & the apostles") + sw("var(--book)", "", "Old Testament books") + sw("var(--ntbook)", "", "New Testament books");
+  let emp = sw("var(--egypt)", "", "Egypt") + sw("var(--assyria)", "", "Assyria") + sw("var(--babylon)", "", "Babylon") + sw("var(--persia)", "", "Persia") + sw("var(--greece)", "", "Greece") + sw("var(--rome)", "", "Rome");
+  if(d) emp += sw("var(--aram)", "", "Aram (Syria)");
+  let pat = sw("var(--ink)", "window", "Dating window, exact years unknown");
+  if(d) pat += sw("var(--ink)", "hatch", "Coregency or rival reign");
+  if(S.alt) pat += sw("var(--ink)", "ghost", "Alternate dating");
+  pat += `<span><i class="sw line"></i>Key event</span>` + `<span><i class="sw" style="--c:var(--ink);background:repeating-linear-gradient(90deg,transparent 0 3px,var(--rule) 3px 4px)"></i>Before Abraham, not to scale</span>`;
+  legendPop.innerHTML = `<div class="pop-head"><h2>Legend</h2><button class="btn" data-close>Close</button></div>
+    <h3>${S.colorBy === "verdict" ? "Verdict on each king" : S.colorBy === "dynasty" ? "Dynasties" : "Kingdoms"}</h3><div class="grid">${colorKey()}</div>
+    <h3>Other lanes</h3><div class="grid">${lanes}</div>
+    <h3>World powers</h3><div class="grid">${emp}</div>
+    <h3>Patterns</h3><div class="grid">${pat}</div>`;
+}
+
+/* ---------- Popovers ---------- */
+const lanesPop = document.getElementById("lanesPop"), legendPop = document.getElementById("legendPop");
+let popAnchor = null;
+function openPop(pop, anchor){
+  closePops();
+  pop.hidden = false; popAnchor = anchor; anchor.setAttribute("aria-expanded", "true");
+  const r = anchor.getBoundingClientRect(), w = pop.offsetWidth;
+  pop.style.left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12)) + "px";
+  pop.style.top = Math.min(r.bottom + 6, window.innerHeight - 120) + "px";
+}
+function closePops(){
+  [lanesPop, legendPop, document.getElementById("jumpPop")].forEach(p => p.hidden = true);
+  document.querySelectorAll('[aria-controls="lanesPop"],[aria-controls="legendPop"],[aria-controls="jumpPop"]').forEach(b => b.setAttribute("aria-expanded", "false"));
+  popAnchor = null;
+}
+const grip = `<svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="4" r="1.7"/><circle cx="10" cy="4" r="1.7"/><circle cx="4" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="4" cy="16" r="1.7"/><circle cx="10" cy="16" r="1.7"/></g></svg>`;
+function renderLanesPop(){
+  const n = S.order.length;
+  lanesPop.innerHTML = `<div class="pop-head"><h2>Lanes</h2><button class="btn" data-close>Close</button></div>
+  <p class="p-help">Drag to reorder, so lanes you want to compare sit side by side. Uncheck to hide.</p>
+  <ul class="lanes" id="lanesList">${S.order.map((id, i) => {
+    const g = GMAP[id], on = S.show[id] !== false;
+    const note = DONLY[id] && S.view !== "d" ? "<small>Shows in Detailed view</small>" : id === "united" || id === "judah" || id === "israel" ? (S.view === "o" ? "<small>One bar in Overview</small>" : "") : "";
+    return `<li data-g="${id}" class="${on ? "" : "off"}">
+      <button class="handle" aria-label="Drag to reorder ${esc(g.title)}">${grip}</button>
+      <input type="checkbox" ${on ? "checked" : ""} aria-label="Show ${esc(g.title)}">
+      <i class="lsw" style="--c:${GCOLOR[id]}"></i>
+      <span class="lname">${esc(g.title)}${note}</span>
+      <button class="mv" data-mv="-1" aria-label="Move ${esc(g.title)} up" ${i === 0 ? "disabled" : ""}>▲</button>
+      <button class="mv" data-mv="1" aria-label="Move ${esc(g.title)} down" ${i === n - 1 ? "disabled" : ""}>▼</button>
+    </li>`;}).join("")}</ul>
+  <div class="pop-actions"><button class="btn" id="lanesAll">Show all</button><button class="btn" id="lanesReset">Reset order</button></div>`;
+}
+function saveLanes(){ try{ localStorage.setItem("ctr-lanes", JSON.stringify({order:S.order, show:S.show})); }catch(e){} }
+function loadLanes(){
+  S.order = GROUPS.map(g => g.id);
+  GROUPS.forEach(g => S.show[g.id] = true);
+  try{
+    const v = JSON.parse(localStorage.getItem("ctr-lanes") || "null");
+    if(v && Array.isArray(v.order)){
+      const known = v.order.filter(id => GMAP[id]);
+      S.order = known.concat(GROUPS.map(g => g.id).filter(id => !known.includes(id)));
+      Object.keys(v.show || {}).forEach(k => { if(GMAP[k]) S.show[k] = !!v.show[k]; });
+    }
+  }catch(e){}
+}
+function lanesChanged(){ saveLanes(); render(); renderLanesPop(); }
+lanesPop.addEventListener("change", e => {
+  const li = e.target.closest("li"); if(!li) return;
+  S.show[li.dataset.g] = e.target.checked; lanesChanged();
+});
+lanesPop.addEventListener("click", e => {
+  if(e.target.closest("[data-close]")){ closePops(); return; }
+  const mv = e.target.closest("[data-mv]");
+  if(mv){
+    const id = mv.closest("li").dataset.g, i = S.order.indexOf(id), j = i + (+mv.dataset.mv);
+    if(j < 0 || j >= S.order.length) return;
+    S.order.splice(i, 1); S.order.splice(j, 0, id); lanesChanged();
+    const btn = lanesPop.querySelector(`li[data-g="${id}"] [data-mv="${mv.dataset.mv}"]`);
+    if(btn && !btn.disabled) btn.focus();
+    return;
+  }
+  if(e.target.id === "lanesAll"){ GROUPS.forEach(g => S.show[g.id] = true); lanesChanged(); }
+  if(e.target.id === "lanesReset"){ S.order = GROUPS.map(g => g.id); lanesChanged(); }
+});
+lanesPop.addEventListener("pointerdown", e => {
+  const hd = e.target.closest(".handle"); if(!hd) return;
+  e.preventDefault();
+  const list = lanesPop.querySelector("#lanesList"), li = hd.closest("li");
+  li.classList.add("dragging");
+  const move = ev => {
+    const y = ev.clientY;
+    const others = [...list.children].filter(x => x !== li);
+    const before = others.find(o => { const r = o.getBoundingClientRect(); return y < r.top + r.height / 2; });
+    if(before){ if(li.nextElementSibling !== before) list.insertBefore(li, before); }
+    else if(list.lastElementChild !== li) list.appendChild(li);
+    const pr = lanesPop.getBoundingClientRect();
+    if(y < pr.top + 40) lanesPop.scrollTop -= 8; else if(y > pr.bottom - 40) lanesPop.scrollTop += 8;
+  };
+  const up = () => {
+    window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); window.removeEventListener("pointercancel", up);
+    li.classList.remove("dragging");
+    S.order = [...list.children].map(x => x.dataset.g);
+    lanesChanged();
+  };
+  window.addEventListener("pointermove", move); window.addEventListener("pointerup", up); window.addEventListener("pointercancel", up);
+});
+legendPop.addEventListener("click", e => { if(e.target.closest("[data-close]")) closePops(); });
+document.getElementById("lanesBtn").addEventListener("click", e => {
+  if(!lanesPop.hidden){ closePops(); return; }
+  renderLanesPop(); openPop(lanesPop, e.currentTarget);
+});
+document.getElementById("legend").addEventListener("click", e => {
+  const b = e.target.closest("#legendBtn"); if(!b) return;
+  if(!legendPop.hidden){ closePops(); renderLegend(); return; }
+  renderLegendPop(); openPop(legendPop, b);
+});
+document.addEventListener("pointerdown", e => {
+  if(!popAnchor) return;
+  if(e.target.closest(".pop") || e.target.closest('[aria-controls="lanesPop"],[aria-controls="legendPop"],[aria-controls="jumpPop"]')) return;
+  closePops();
+});
+
+/* ---------- Panel ---------- */
+const panel = document.getElementById("panel");
+function openPanel(html){
+  panel.innerHTML = `<div class="p-head"><div></div><button class="btn" id="closePanel" aria-label="Close details">Close</button></div>` + html;
+  panel.hidden = false; panel.scrollTop = 0;
+  document.getElementById("closePanel").onclick = closePanel;
+}
+function closePanel(){
+  panel.hidden = true; S.sel = null; S.pin = null;
+  render();
+}
+function role(it){
+  switch(it.kind){
+    case "king": return it.id === "athaliah" ? "Queen of Judah" : it.group === "judah" ? "King of Judah" : it.group === "israel" ? "King of Israel" : "King of united Israel";
+    case "summary": return "Kingdom";
+    case "prophet": return (it.group === "prophets" ? "Writing prophet " : "Prophet ") + AUD[it.aud];
+    case "book": return ({law:"Book of the Law", history:"Historical book", poetry:"Book of poetry and wisdom", gospel:"Gospel", "nt-history":"New Testament history", letter:"New Testament letter", apocalyptic:"Prophecy"})[it.cat] || "Book";
+    case "era": return "Era";
+    case "event": return "Event";
+    case "empire": return it.summary ? "World power" : "Ruler of " + EMP[it.emp];
+    case "person": return it.role || "";
+    case "ruler": return it.role || "Ruler in Judea";
+    case "leader": return "Leader in the exile and return";
+  }
+  return "";
+}
+function chip(it){
+  return `<button class="chip k" data-go="${it.id}" style="--c:${colorOf(it)}">${esc(it.name)}</button>`;
+}
+function overlapsSpan(it, s, e){ const a = fullStart(it), b = it.end; return a >= e && s >= b; }
+function contemporaries(it){
+  const s = fullStart(it), e = it.end;
+  const pool = D.filter(o => o !== it && !o.pre && !o.summary && o.views.includes(S.view) && visible(o) && !["era","book","event","summary"].includes(o.kind));
+  const groups = {};
+  pool.filter(o => overlapsSpan(o, s, e)).forEach(o => { (groups[o.group] = groups[o.group] || []).push(o); });
+  let h = "";
+  GROUPS.forEach(g => {
+    if(!groups[g.id]) return;
+    if(g.id === it.group && it.kind === "king") return;
+    h += `<h4>${esc(g.title)}</h4><div class="chips">${groups[g.id].sort((a, b) => fullStart(b) - fullStart(a)).map(chip).join("")}</div>`;
+  });
+  const evs = D.filter(o => o.kind === "event" && o.views.includes(S.view) && o.start <= s && o.start >= e);
+  if(evs.length) h += `<h4>Events in this span</h4><div class="chips">${evs.map(chip).join("")}</div>`;
+  return h;
+}
+function showItem(id){
+  const it = byId[id]; if(!it) return;
+  S.sel = id; S.pin = null;
+  let dates;
+  if(it.pre && it.kind !== "book") dates = "Before Abraham (undated)";
+  else if(it.kind === "event") dates = fy(it.start);
+  else if(it.coStart) dates = `${it.coKind === "rival" ? "Rival reign from" : "Coregent from"} ${it.coStart}, sole reign ${range(it.start, it.end)}`;
+  else if(it.window) dates = `Dating window ${range(it.start, it.end)}`;
+  else if(["king","empire","summary","era","ruler"].includes(it.kind) || it.pre) dates = range(it.start, it.end);
+  else dates = `c. ${range(it.start, it.end)}`;
+
+  let h = `<div class="p-kicker">${esc(role(it))}</div><h2>${esc(it.name)}</h2><div class="p-dates">${esc(dates)}</div>`;
+  if(it.alt) h += `<div class="p-alt">Alternate view: ${esc(range(it.alt[0], it.alt[1]))}, ${esc(it.alt[2])}</div>`;
+
+  const facts = [];
+  if(it.aka) facts.push(["Also called", esc(it.aka)]);
+  if(it.years) facts.push(["Scripture says", esc(it.years)]);
+  if(it.verdict) facts.push(["Verdict", `<span class="pill" style="--c:var(--${it.verdict})">${VERDICT[it.verdict]}</span>${it.verdictRef ? `<span class="p-help">${esc(it.verdictRef)}</span>` : ""}`]);
+  if(it.dynasty && it.kind === "king") facts.push(["House", esc(it.dynasty === "David" ? "David" : it.id === "athaliah" ? "Omri, by birth (a usurper in Judah)" : it.dynasty)]);
+  if(it.ended) facts.push(["Reign ended", esc(it.ended)]);
+  if(facts.length) h += `<dl class="facts">${facts.map(f => `<dt>${f[0]}</dt><dd>${f[1]}</dd>`).join("")}</dl>`;
+  if(it.note) h += `<p class="p-note">${esc(it.note)}</p>`;
+
+  if(it.refs || it.verdictRef) h += `<div class="p-sec"><h3>Read it</h3><ul class="refs">${refLinks(it.refs)}</ul></div>`;
+  const books = OT_ORDER.filter(b => it.books.has(b));
+  if(books.length) h += `<div class="p-sec"><h3>Books of the Bible</h3><div class="chips">${books.map(b => `<button class="chip${S.book === b ? " on" : ""}" data-book="${esc(b)}" aria-pressed="${S.book === b}">${esc(b)}</button>`).join("")}</div><p class="p-help" style="margin-top:6px">Tap a book to focus the chart on it. Tap it again to clear.</p></div>`;
+
+  if(["king","prophet","leader","empire","book","person","ruler"].includes(it.kind) && !it.pre && !it.summary){
+    const c = contemporaries(it);
+    if(c) h += `<div class="p-sec"><h3>${it.kind === "book" ? "Who appears in this span" : "Contemporaries"}</h3>${c}</div>`;
+  } else if(["era","summary"].includes(it.kind) || it.summary){
+    const s = it.start, e = it.end;
+    const ps = D.filter(o => (o.kind === "prophet" && o.group === "prophets" || o.kind === "person" && !o.pre && o.views.includes(S.view)) && overlapsSpan(o, s, e));
+    const evs = D.filter(o => o.kind === "event" && o.views.includes(S.view) && o.start <= s && o.start >= e);
+    h += `<div class="p-sec"><h3>In this period</h3>${ps.length ? `<h4>People</h4><div class="chips">${ps.map(chip).join("")}</div>` : ""}${evs.length ? `<h4>Events</h4><div class="chips">${evs.map(chip).join("")}</div>` : ""}</div>`;
+  } else if(it.kind === "event"){
+    const y = it.start;
+    const on = it.pre ? [] : D.filter(o => ["king","prophet","person","ruler"].includes(o.kind) && !o.pre && o.views.includes(S.view) && fullStart(o) >= y && o.end <= y);
+    if(on.length) h += `<div class="p-sec"><h3>On the scene that year</h3><div class="chips">${on.map(chip).join("")}</div></div>`;
+  }
+  openPanel(h);
+  render();
+}
+function showYear(y){
+  S.pin = y; S.sel = null;
+  const on = D.filter(o => o.views.includes(S.view) && visible(o) && o.kind !== "event" && fullStart(o) >= y && o.end <= y);
+  let h = `<div class="p-kicker">Snapshot</div><h2>${y >= PREEND ? "Before Abraham" : fy(y)}</h2>`;
+  const era = on.find(o => o.kind === "era");
+  if(era) h += `<div class="p-dates">${esc(era.name)}</div>`;
+  let any = false;
+  GROUPS.forEach(g => {
+    if(g.id === "era") return;
+    const list = on.filter(o => o.group === g.id);
+    if(!list.length) return;
+    any = true;
+    h += `<div class="p-sec"><h3>${esc(g.title)}</h3><div class="chips">${list.map(chip).join("")}</div></div>`;
+  });
+  const evs = D.filter(o => o.kind === "event" && o.views.includes(S.view));
+  const near = evs.slice().sort((a, b) => Math.abs(a.start - y) - Math.abs(b.start - y))[0];
+  if(near && y < PREEND) h += `<div class="p-sec"><h3>Nearest key event</h3><div class="chips">${chip(near)}</div><p class="p-help" style="margin-top:6px">${Math.abs(near.start - y) === 0 ? "That same year." : Math.abs(near.start - y) + " years " + (near.start > y ? "earlier" : "later") + "."}</p></div>`;
+  if(!any) h += `<p class="p-help">No one in the visible lanes is on the scene that year. Try the Detailed view or loosen the filters.</p>`;
+  openPanel(h);
+  render();
+}
+function showAbout(){
+  S.sel = null; S.pin = null;
+  openPanel(`<div class="p-kicker">Method and sources</div><h2>About the dates</h2>
+  <p>Every date here is approximate, and some are debated. The chart follows a conservative reading that takes Scripture’s own numbers at face value, and flags the main alternatives.</p>
+  <div class="p-sec"><h3>Creation to Abraham</h3>
+  <p>Genesis 1–11 is drawn in a separate zone without a scale. The genealogies of Genesis 5 and 11, read without gaps in the Hebrew text, put creation near 4000 BC and the flood near 2350 BC; the Septuagint runs longer, and some hold that the genealogies skip generations.</p></div>
+  <div class="p-sec"><h3>Abraham to the judges</h3>
+  <p>Anchored on 1 Kings 6:1: the temple was begun in 967, “the 480th year” after the exodus, so the exodus was in 1446. Exodus 12:40 gives 430 years in Egypt, so Jacob arrived in 1876. Genesis supplies the patriarchs’ ages from there: Abraham born 2166, entering Canaan 2091 (following Eugene Merrill, <em>Kingdom of Priests</em>). Some date the exodus to about 1270, and some count the 430 years from Abraham. The judges’ dates are approximate because their terms overlap.</p></div>
+  <div class="p-sec"><h3>The kings</h3>
+  <p>Edwin Thiele’s chronology (<em>The Mysterious Numbers of the Hebrew Kings</em>, 1983), as refined by Rodger C. Young (<em>JETS</em> 48/2, 2005). It matches every reign length and cross-reference in Kings and Chronicles to fixed Assyrian and Babylonian dates such as Qarqar (853), Jehu’s tribute (841), and Sennacherib’s invasion (701). A year like 931 stands for 931/930, because Judah counted regnal years from the fall and Israel from the spring.</p>
+  <ul class="plain">
+    <li><strong>Coregencies and rival reigns</strong> explain why the totals in Kings run longer than the calendar. The Detailed view shows them hatched.</li>
+    <li><strong>Saul and David</strong> are approximate; Scripture gives no synchronisms for them.</li>
+    <li><strong>Jerusalem’s fall</strong> is 587 (Young); Thiele and many charts use 586. Samaria fell in 723/722.</li>
+  </ul></div>
+  <div class="p-sec"><h3>Prophets</h3>
+  <p>Dated by their opening verses where given, and by internal evidence where not. Undated books appear as dashed dating windows. Obadiah and Joel are placed early; turn on alternate dates in Filters to see later views.</p></div>
+  <div class="p-sec"><h3>Between the Testaments</h3>
+  <p>Dates for Alexander, the Ptolemies and Seleucids, the Maccabees, and the Hasmoneans come from secular history (1–2 Maccabees and Josephus), which Daniel 8 and 11 foretold in outline.</p></div>
+  <div class="p-sec"><h3>The New Testament</h3>
+  <ul class="plain">
+    <li><strong>Jesus’ birth</strong> came before Herod died in 4 BC, so probably 6–4 BC.</li>
+    <li><strong>The crucifixion</strong> is shown at AD 30; AD 33 is the main alternative and appears with alternate dates turned on.</li>
+    <li><strong>Gospels and Acts</strong> span the events they record. <strong>Letters and Revelation</strong> sit at their likely date of writing, as dashed windows.</li>
+    <li>There is no year 0: 1 BC is followed by AD 1.</li>
+  </ul></div>
+  <div class="p-sec"><h3>How to use it</h3>
+  <ul class="plain">
+    <li><strong>Overview</strong> shows eras, empires, kingdoms, the writing prophets, and Jesus and Paul. <strong>Standard</strong> adds every patriarch, judge, king, apostle, and book. <strong>Detailed</strong> adds coregencies, other prophets, Paul’s journeys, rulers, and emperors.</li>
+    <li>Tap a bar for Scripture links, books, and everyone who overlapped it. Tap empty space to pin a year.</li>
+    <li>Pick a book to highlight everything it covers.</li>
+  </ul></div>
+  <p class="p-help">Scripture links open in the ESV at Bible Gateway.</p>`);
+  render();
+}
+
+/* ---------- Jump chips ---------- */
+function renderJump(){
+  const eras = D.filter(i => i.kind === "era").sort((a, b) => b.start - a.start);
+  jumpPop.innerHTML = `<div class="pop-head"><h2>Jump to</h2><button class="btn" data-close>Close</button></div><p class="p-help">Scroll the chart to the start of an era.</p><div class="jumplist">${eras.map(e => `<button class="jumpitem" data-jump="${e.start}"><b>${esc(e.name)}</b><span>${esc(e.pre ? "Undated" : range(e.start, e.end))}</span></button>`).join("")}</div>`;
+}
+function scrollToYear(y, smooth){
+  const x = y >= PREEND ? 0 : X(y);
+  chart.scrollTo({left: Math.max(0, x - 12), behavior: smooth ? "smooth" : "auto"});
+}
+function scrollToItem(id){
+  const el = canvas.querySelector(`[data-id="${CSS.escape(id)}"].bar, [data-id="${CSS.escape(id)}"].ev`);
+  if(!el) return;
+  const it = byId[id];
+  const x = it.pre ? it.pre[0] * PRE_W : X(dispStart(it));
+  const viewW = chart.clientWidth - labelWidth();
+  const left = chart.scrollLeft;
+  if(x < left + 10 || x > left + viewW - 40) chart.scrollTo({left: Math.max(0, x - viewW * 0.3), behavior:"smooth"});
+  const r = el.getBoundingClientRect(), cr = chart.getBoundingClientRect();
+  if(r.top < cr.top + 34 || r.bottom > cr.bottom) chart.scrollBy({top: r.top - cr.top - cr.height / 2, behavior:"smooth"});
+}
+
+/* ---------- Controls ---------- */
+function setView(v){
+  S.view = v;
+  document.querySelectorAll("#viewSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
+  document.getElementById("viewHint").textContent = ({o:"Eras, empires, kingdoms, writing prophets", s:"Every patriarch, king, prophet, apostle, and book", d:"Coregencies, all prophets, rulers, emperors"})[v];
+  document.querySelectorAll(".d-only").forEach(l => l.classList.toggle("na", v !== "d"));
+  S.ppy = defaultPPY();
+  if(S.sel && !byId[S.sel].views.includes(v)){ panel.hidden = true; S.sel = null; }
+  render();
+}
+function setLayout(l){
+  S.layout = l;
+  document.querySelectorAll("#layoutSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.l === l));
+  render();
+}
+function zoom(f){
+  const lw = labelWidth();
+  const viewW = chart.clientWidth - lw;
+  const centerYear = MAXY - (chart.scrollLeft + viewW / 2 - PRE_W) / S.ppy;
+  S.ppy = Math.min(16, Math.max(0.25, f === "fit" ? fitPPY() : S.ppy * f));
+  render();
+  chart.scrollLeft = f === "fit" ? 0 : X(centerYear) - viewW / 2;
+}
+
+document.getElementById("viewSeg").addEventListener("click", e => { const b = e.target.closest("button"); if(b) setView(b.dataset.v); });
+document.getElementById("layoutSeg").addEventListener("click", e => { const b = e.target.closest("button"); if(b) setLayout(b.dataset.l); });
+document.getElementById("colorBy").addEventListener("change", e => { S.colorBy = e.target.value; render(); if(S.sel) showItem(S.sel); });
+const bookSel = document.getElementById("bookSel");
+const presentBooks = new Set(); D.forEach(i => i.books.forEach(b => presentBooks.add(b)));
+OT_ORDER.filter(b => presentBooks.has(b)).forEach(b => { const o = document.createElement("option"); o.value = b; o.textContent = b; bookSel.appendChild(o); });
+let preFocus = null;
+function bookTarget(b){ return D.find(i => i.kind === "book" && i.book === b) || D.find(i => i.book === b); }
+function setBook(b){
+  if(b && !S.book) preFocus = {ppy:S.ppy, left:chart.scrollLeft, top:chart.scrollTop, view:S.view};
+  S.book = b; bookSel.value = b;
+  if(!b){
+    if(preFocus){
+      if(preFocus.view !== S.view) setView(preFocus.view);
+      S.ppy = preFocus.ppy; render();
+      chart.scrollLeft = preFocus.left; chart.scrollTop = preFocus.top;
+    } else render();
+    preFocus = null;
+    if(S.sel && byId[S.sel]) refreshPanel();
+    return;
+  }
+  const t = bookTarget(b);
+  if(t && !t.views.includes(S.view)) setView(t.views.includes("s") ? "s" : "d");
+  const viewW = chart.clientWidth - labelWidth();
+  if(t){
+    const s = fullStart(t), e = t.end;
+    if(t.pre){
+      const pad = 40;
+      S.ppy = Math.min(16, Math.max(0.25, (viewW - PRE_W - 30) / (MAXY - e + pad)));
+      render(); chart.scrollLeft = 0;
+    } else {
+      const pad = Math.max(8, (s - e) * 0.3);
+      S.ppy = Math.min(16, Math.max(0.25, (viewW - 40) / ((s - e) + 2 * pad)));
+      render(); chart.scrollLeft = Math.max(0, X(s + pad));
+    }
+  } else render();
+  chart.scrollTop = 0;
+  if(S.sel && byId[S.sel]) refreshPanel();
+}
+function refreshPanel(){ if(!panel.hidden && S.sel) showItem(S.sel); }
+document.getElementById("focusbar").addEventListener("click", e => { if(e.target.id === "clearFocus") setBook(""); });
+bookSel.addEventListener("change", e => setBook(e.target.value));
+let qt;
+document.getElementById("q").addEventListener("input", e => {
+  clearTimeout(qt);
+  qt = setTimeout(() => {
+    S.q = e.target.value.trim().toLowerCase(); render();
+    if(S.q){ const f = D.find(i => visible(i) && hit(i)); if(f) scrollToItem(f.id); }
+  }, 140);
+});
+const filtersBtn = document.getElementById("filtersBtn"), drawer = document.getElementById("drawer");
+filtersBtn.addEventListener("click", () => { const open = drawer.hidden; drawer.hidden = !open; filtersBtn.setAttribute("aria-expanded", open); });
+drawer.addEventListener("change", e => {
+  const t = e.target, ds = t.dataset;
+  if(ds.verdict) S.verdict[ds.verdict] = t.checked;
+  else if(ds.aud) S.aud[ds.aud] = t.checked;
+  else if(t.id === "altToggle") S.alt = t.checked;
+  render();
+});
+document.getElementById("zoomIn").onclick = () => zoom(1.4);
+document.getElementById("zoomOut").onclick = () => zoom(1 / 1.4);
+document.getElementById("zoomFit").onclick = () => zoom("fit");
+document.getElementById("aboutBtn").onclick = showAbout;
+const jumpPop = document.getElementById("jumpPop");
+jumpPop.addEventListener("click", e => {
+  if(e.target.closest("[data-close]")){ closePops(); return; }
+  const b = e.target.closest("[data-jump]"); if(b){ closePops(); scrollToYear(+b.dataset.jump, true); }
+});
+document.getElementById("jumpBtn").addEventListener("click", e => {
+  if(!jumpPop.hidden){ closePops(); return; }
+  renderJump(); openPop(jumpPop, e.currentTarget);
+});
+
+panel.addEventListener("click", e => {
+  const go = e.target.closest("[data-go]");
+  if(go){ showItem(go.dataset.go); scrollToItem(go.dataset.go); return; }
+  const bk = e.target.closest("[data-book]");
+  if(bk) setBook(S.book === bk.dataset.book ? "" : bk.dataset.book);
+});
+
+function yearAt(clientX){
+  const r = canvas.getBoundingClientRect();
+  const x = clientX - r.left - labelWidth();
+  if(x < 0) return null;
+  if(x < PRE_W) return PREEND;
+  const y = Math.round(MAXY - (x - PRE_W) / S.ppy);
+  return (y < MINY) ? null : Math.min(y, MAXY);
+}
+chart.addEventListener("click", e => {
+  const t = e.target.closest("[data-id]");
+  if(t){ showItem(t.dataset.id); return; }
+  if(e.target.closest(".lab")) return;
+  const y = yearAt(e.clientX);
+  if(y != null) showYear(y);
+});
+chart.addEventListener("pointermove", e => {
+  const hv = document.getElementById("hover"), tag = document.getElementById("hoverTag");
+  if(!hv) return;
+  const y = e.pointerType === "touch" ? null : yearAt(e.clientX);
+  if(y == null || e.target.closest(".lab")){ hv.style.display = "none"; tag.style.display = "none"; return; }
+  const x = y >= PREEND ? PRE_W / 2 : X(y);
+  hv.style.display = y >= PREEND ? "none" : "block"; hv.style.left = x + "px";
+  tag.style.display = "block"; tag.style.left = x + "px"; tag.textContent = y >= PREEND ? "Before Abraham" : fy(y);
+});
+chart.addEventListener("pointerleave", () => {
+  const hv = document.getElementById("hover"), tag = document.getElementById("hoverTag");
+  if(hv){ hv.style.display = "none"; tag.style.display = "none"; }
+});
+document.addEventListener("keydown", e => { if(e.key !== "Escape") return; if(popAnchor){ const a = popAnchor; closePops(); a.focus(); } else if(!panel.hidden) closePanel(); });
+let rt;
+window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 150); });
+
+/* ---------- Init ---------- */
+/* ---------- Theme ---------- */
+const themeBtn = document.getElementById("themeBtn");
+const sysDark = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+function currentDark(){
+  const t = document.documentElement.dataset.theme;
+  return t ? t === "dark" : !!(sysDark && sysDark.matches);
+}
+function syncThemeBtn(){
+  const dark = currentDark();
+  document.documentElement.classList.toggle("is-dark", dark);
+  const label = dark ? "Switch to light mode" : "Switch to dark mode";
+  themeBtn.setAttribute("aria-label", label); themeBtn.title = label;
+}
+function applyTheme(t){
+  if(t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  syncThemeBtn();
+}
+try{ applyTheme(localStorage.getItem("ctr-theme")); }catch(e){ applyTheme(null); }
+themeBtn.addEventListener("click", () => {
+  const next = currentDark() ? "light" : "dark";
+  applyTheme(next);
+  try{ localStorage.setItem("ctr-theme", next); }catch(e){}
+});
+if(sysDark && sysDark.addEventListener) sysDark.addEventListener("change", syncThemeBtn);
+
+loadLanes();
+renderJump();
+setLayout(S.layout);
+setView("s");
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => { for(const k in twCache) delete twCache[k]; render(); });
+</script>
+</body>
+</html>
